@@ -1,0 +1,398 @@
+import ROOT
+from ROOT import TLorentzVector
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
+
+import math
+import os
+import numpy as np
+from numpy import sign
+
+class TTCProducer(Module):
+  def __init__( self , year ):
+    self.year = year
+  def beginJob(self):
+    pass
+  def endJob(self):
+    pass
+  def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+    self.out = wrappedOutputTree
+    self.out.branch("HLT_passEle32WPTight", "I")
+    self.out.branch("ttc_nl", "B")
+    self.out.branch("ttc_jets", "B")
+    self.out.branch("n_bjet", "I")
+    self.out.branch("n_nobjet", "I")
+    self.out.branch("ttc_region", "I")
+    self.out.branch("ttc_l1_id", "I")
+    self.out.branch("ttc_l2_id", "I")
+    self.out.branch("WZ_region", "I")
+    self.out.branch("WZ_zl1_id", "I")
+    self.out.branch("WZ_zl2_id", "I")
+    self.out.branch("WZ_wl_id", "I")
+    self.out.branch("DY_region", "I")
+    self.out.branch("DY_l1_id", "I")
+    self.out.branch("DY_l2_id", "I")
+    self.out.branch("tightJets_nob_CSVmedium_id","I",lenVar="nJet")
+    self.out.branch("tightJets_b_CSVmedium_id","I",lenVar="nJet")
+    self.out.branch("tightJets_nob_DeepCSVmedium_id","I",lenVar="nJet")
+    self.out.branch("tightJets_b_DeepCSVmedium_id","I",lenVar="nJet")
+    self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
+  def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+    pass
+
+  def analyze(self, event):
+    
+    # PV selection
+    if (event.PV_npvsGood<1): return False
+
+    # trigger selection
+    # special action for 2017 single ele HLT, https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations#Single_Electron_Triggers
+    HLT_passEle32WPTight=0
+    if self.year=="2017":
+      trgobjs=Collection(event, 'TrigObj')
+      if event.HLT_Ele32_WPTight_Gsf_L1DoubleEG==1:
+	for iobj in range(0,event.nTrigObj):
+	  if trgobjs[iobj].id==11 and (trgobjs[iobj].filterBits & (1<<10))== (1<<10):
+	    HLT_passEle32WPTight=1
+
+    self.out.fillBranch("HLT_passEle32WPTight",HLT_passEle32WPTight)
+
+    # total number of ele+muon, currently require at least 2 leptons
+    if ((event.nMuon + event.nElectron) < 2): return False
+
+    # Muon selection: tight cut-based ID + tight PF iso, or loose cut-based ID + loose PF iso, with pt > 20 GeV
+    muons = Collection(event, 'Muon')
+    muon_v4_temp=TLorentzVector()
+    tightMuons = []
+    tightMuons_pdgid = []
+    tightMuons_id = []
+    additional_looseMuons = []
+    additional_looseMuons_pdgid = []
+    additional_looseMuons_id = []
+    for imu in range(0, event.nMuon):
+      if (muons[imu].tightId):
+        if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and event.Muon_corrected_pt[imu]>20):
+          muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+          tightMuons.append(muon_v4_temp.Clone())
+          tightMuons_pdgid.append(muons[imu].pdgId)
+          tightMuons_id.append(imu)
+      elif (muons[imu].looseId):
+        if (muons[imu].pfRelIso04_all<0.25 and abs(muons[imu].eta)<2.4 and event.Muon_corrected_pt[imu]>10):
+          muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+          additional_looseMuons.append(muon_v4_temp.Clone())
+          additional_looseMuons_pdgid.append(muons[imu].pdgId)
+          additional_looseMuons_id.append(imu)
+
+    # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 10 GeV
+    electrons = Collection(event, 'Electron')
+    electron_v4_temp=TLorentzVector()
+    tightElectrons = []
+    tightElectrons_pdgid = []
+    tightElectrons_id = []
+    additional_vetoElectrons = []
+    additional_vetoElectrons_pdgid = []
+    additional_vetoElectrons_id = []
+    for iele in range(0, event.nElectron):
+      if (electrons[iele].cutBased==4):
+        if (electrons[iele].tightCharge==2 and ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz<0.1)) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>20):
+          electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          tightElectrons.append(electron_v4_temp.Clone())
+          tightElectrons_pdgid.append(electrons[iele].pdgId)
+          tightElectrons_id.append(iele)
+      elif (electrons[iele].cutBased==1):
+        if (((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz<0.1)) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>10):
+          electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          additional_vetoElectrons.append(electron_v4_temp.Clone())
+          additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
+          additional_vetoElectrons_id.append(iele)
+
+    # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
+    # tight ak4 jets, 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
+    # DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
+    # DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
+
+    # c-jet tag is based on two-D cuts, medium DeepJet WP:
+    # CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
+    # c-tag not available in NANOAOD yet
+
+    jets = Collection(event, 'Jet')
+    tightJets_nob_CSVmedium_id = []
+    tightJets_b_CSVmedium_id = []
+
+    tightJets_nob_DeepCSVmedium_id = []
+    tightJets_b_DeepCSVmedium_id = []
+
+    for ijet in range(0, event.nJet):
+      if self.year=="2016":
+        if jets[ijet].jetId==7 and jets[ijet].pt>30 and abs(jets[ijet].eta)<2.4: 
+          if (jets[ijet].btagCSVV2 > 0.8838):
+            tightJets_b_CSVmedium_id.append(ijet)
+          else:tightJets_nob_CSVmedium_id.append(ijet)
+          if (jets[ijet].btagDeepB > 0.4941):
+            tightJets_b_DeepCSVmedium_id.append(ijet)
+          else:tightJets_nob_DeepCSVmedium_id.append(ijet)
+
+      elif (self.year=="2017" or self.year=="2018"):
+	if jets[ijet].jetId==6 and jets[ijet].pt>30 and abs(jets[ijet].eta)<2.4:
+          if (jets[ijet].btagDeepB > 0.4506):
+            tightJets_b_CSVmedium_id.append(ijet)
+          else:tightJets_nob_CSVmedium_id.append(ijet)
+          if (jets[ijet].btagDeepFlavB > 0.3040):
+            tightJets_b_DeepCSVmedium_id.append(ijet)
+          else:tightJets_nob_DeepCSVmedium_id.append(ijet)
+
+    tightJets_b_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_CSVmedium_id),int)-1)
+    tightJets_nob_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_CSVmedium_id),int)-1)
+    tightJets_b_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_DeepCSVmedium_id),int)-1)
+    tightJets_nob_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_DeepCSVmedium_id),int)-1)
+    
+    self.out.fillBranch("tightJets_nob_CSVmedium_id",tightJets_nob_CSVmedium_id)
+    self.out.fillBranch("tightJets_b_CSVmedium_id",tightJets_b_CSVmedium_id)
+    self.out.fillBranch("tightJets_nob_DeepCSVmedium_id",tightJets_nob_DeepCSVmedium_id)
+    self.out.fillBranch("tightJets_b_DeepCSVmedium_id",tightJets_b_DeepCSVmedium_id)
+
+    # tight leptons and additional loose leptons collection
+    tightLeptons = tightMuons + tightElectrons
+    tightLeptons.sort(key=lambda x: x.Pt(), reverse=True)
+    looseLeptons = additional_looseMuons + additional_vetoElectrons
+    looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
+
+    if len(tightLeptons)<2:return False
+
+    #    t     t      cccc
+    #  ttttt ttttt   cc
+    #    t     t    cc
+    #    t     t     cc
+    #    ttt   ttt    cccc
+    #region: only 2 tight leptons, at least three jets, 2 b-jet and 1 cjet (c-tag not available yet), mll>20, |Z-91.1876|>15 in 2 ele case
+    #ttc region lepton number selections
+    ttc_nl=False
+    #ttc region jet and bjet selection
+    ttc_jets=False
+    #ttc region tag, 1:2 muon, 2:1 muon, 3:0 muon
+    ttc_region=0
+    ttc_l1_id=-1
+    ttc_l2_id=-1
+    
+    # the two leptons with pt >30/20, 3th lepton veto
+    if len(tightLeptons)==2 and tightLeptons[0].Pt()>30 and len(looseLeptons)==0:
+      ttc_nl=True
+    # at least three jets and two bjets
+    n_bjet=0
+    n_nobjet=0
+    for ijet in range(0,len(tightJets_b_DeepCSVmedium_id)):
+      if tightJets_b_DeepCSVmedium_id[ijet]>-1:
+	n_bjet=n_bjet+1
+    for ijet in range(0,len(tightJets_nob_DeepCSVmedium_id)):
+      if tightJets_nob_DeepCSVmedium_id[ijet]>-1:
+        n_nobjet=n_nobjet+1
+
+    if ttc_nl and (n_nobjet+n_bjet)>2 and n_bjet>1:
+      ttc_jets=True
+
+    if ttc_nl:
+      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26 and (tightMuons[0]+tightMuons[1]).M()>20 and (tightMuons[0].DeltaR(tightMuons[1]))>0.3:
+	ttc_region=1
+	ttc_l1_id=tightMuons_id[0]
+	ttc_l2_id=tightMuons_id[1]
+      if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24 and (tightMuons[0]+tightElectrons[0]).M()>20 and (tightMuons[0].DeltaR(tightElectrons[0]))>0.3:
+	ttc_region=2
+	ttc_l1_id=tightMuons_id[0]
+	ttc_l2_id=tightElectrons_id[0]
+      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22 and (tightElectrons[0]+tightElectrons[1]).M()>20 and abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)>15 and (tightElectrons[0].DeltaR(tightElectrons[1]))>0.3:
+	ttc_region=3
+	ttc_l1_id=tightElectrons_id[0]
+	ttc_l2_id=tightElectrons_id[1]
+
+    self.out.fillBranch("ttc_nl", ttc_nl)
+    self.out.fillBranch("ttc_jets", ttc_jets)
+    self.out.fillBranch("n_bjet", n_bjet)
+    self.out.fillBranch("n_nobjet", n_nobjet)
+    self.out.fillBranch("ttc_region", ttc_region)
+    self.out.fillBranch("ttc_l1_id", ttc_l1_id)
+    self.out.fillBranch("ttc_l2_id", ttc_l2_id)
+    
+
+    # WW     WWW     WW ZZZZZZZZZ   region: only 3 tight leptons, no b-jet, mll>4, |Z-91.1876|<15
+    # WW     WWW     WW       ZZ            MET>30
+    #  WW   WW WW   WW      ZZ
+    #   WW WW   WW WW     ZZ
+    #    WWW     WWW    ZZZZZZZZZ
+
+    #WZ region lepton number selections
+    WZ_nl=False
+    #WZ region b-jet selection
+    WZ_nb=False
+    #WZ region lepton kinematics selctions
+    WZ_leptons=False
+    #WZ region MET selection
+    WZ_MET=False
+    #WZ region tag, 0: fail to pass the WZ selection, 1:3 muon, 2:2muon, 3:1muon, 4:0 muon
+    WZ_region=0
+    WZ_zl1_id=-1
+    WZ_zl2_id=-1
+    WZ_wl_id=-1
+
+    # the first two leading leptons with pt >20, 3rd lepton pt >15, 4th lepton veto
+    if len(tightLeptons)==3 and tightLeptons[2].Pt()>15 and len(looseLeptons)==0:
+      WZ_nl=True
+    # no bjet
+    if WZ_nl and tightJets_b_DeepCSVmedium_id[0]==-1:
+      WZ_nb=True
+
+    # mll>4 regardless the flavor and charge sign
+    if WZ_nb and (tightLeptons[0]+tightLeptons[1]).M()>4 and (tightLeptons[2]+tightLeptons[1]).M()>4 and (tightLeptons[0]+tightLeptons[2]).M()>4:
+      WZ_leptons=True
+    
+    if WZ_leptons and event.MET_pt>30:
+      WZ_MET=True
+
+    if WZ_MET:
+      # 3 muons case
+      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1]+tightMuons_pdgid[2])==13:
+	#two combination 0+2 or 1+2
+        if (tightMuons_pdgid[0]-tightMuons_pdgid[1])==0:
+          if abs((tightMuons[0]+tightMuons[2]).M()-91.1876)<abs((tightMuons[1]+tightMuons[2]).M()-91.1876) and abs((tightMuons[0]+tightMuons[2]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[0]
+            WZ_zl2_id=tightMuons_id[2]
+            WZ_wl_id=tightMuons_id[1]
+	  if abs((tightMuons[0]+tightMuons[2]).M()-91.1876)>abs((tightMuons[1]+tightMuons[2]).M()-91.1876) and abs((tightMuons[1]+tightMuons[2]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[1]
+            WZ_zl2_id=tightMuons_id[2]
+            WZ_wl_id=tightMuons_id[0]
+	#two combination 0+1 or 1+2
+	elif (tightMuons_pdgid[0]-tightMuons_pdgid[2])==0:
+	  if abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<abs((tightMuons[1]+tightMuons[2]).M()-91.1876) and abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[0]
+            WZ_zl2_id=tightMuons_id[1]
+            WZ_wl_id=tightMuons_id[2]
+	  if abs((tightMuons[0]+tightMuons[1]).M()-91.1876)>abs((tightMuons[1]+tightMuons[2]).M()-91.1876) and abs((tightMuons[1]+tightMuons[2]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[1]
+            WZ_zl2_id=tightMuons_id[2]
+            WZ_wl_id=tightMuons_id[0]
+	#two combination 0+1 or 0+2
+	else:
+	  if abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<abs((tightMuons[0]+tightMuons[2]).M()-91.1876) and abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[0]
+            WZ_zl2_id=tightMuons_id[1]
+            WZ_wl_id=tightMuons_id[2]
+	  if abs((tightMuons[0]+tightMuons[1]).M()-91.1876)>abs((tightMuons[0]+tightMuons[2]).M()-91.1876) and abs((tightMuons[0]+tightMuons[2]).M()-91.1876)<15:
+	    WZ_region=1
+            WZ_zl1_id=tightMuons_id[0]
+            WZ_zl2_id=tightMuons_id[2]
+            WZ_wl_id=tightMuons_id[1]
+
+      # 2 muons case
+      if len(tightElectrons)==1 and (tightMuons_pdgid[0]-tightMuons_pdgid[1])==0:
+	if abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<15:
+	  WZ_region=2
+	  WZ_zl1_id=tightMuons_id[0]
+	  WZ_zl2_id=tightMuons_id[1]
+	  WZ_wl_id=tightElectrons_id[0]
+
+      # 1 muon case
+      if len(tightElectrons)==2 and (tightElectrons_pdgid[0]-tightElectrons_pdgid[1])==0:
+	if abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<15:
+	  WZ_region=3
+	  WZ_zl1_id=tightElectrons_id[0]
+	  WZ_zl2_id=tightElectrons_id[1]
+	  WZ_wl_id=tightMuons_id[0]
+
+      # 0 muon case
+      if len(tightElectrons)==3 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1]+tightElectrons_pdgid[2])==11:
+	#two combination 0+2 or 1+2
+        if (tightElectrons_pdgid[0]-tightElectrons_pdgid[1])==0:
+          if abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876)<abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[0]
+            WZ_zl2_id=tightElectrons_id[2]
+            WZ_wl_id=tightElectrons_id[1]
+	  if abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876)>abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[1]
+            WZ_zl2_id=tightElectrons_id[2]
+            WZ_wl_id=tightElectrons_id[0]
+	#two combination 0+1 or 1+2
+	elif (tightElectrons_pdgid[0]-tightElectrons_pdgid[2])==0:
+	  if abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[0]
+            WZ_zl2_id=tightElectrons_id[1]
+            WZ_wl_id=tightElectrons_id[2]
+	  if abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)>abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[1]+tightElectrons[2]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[1]
+            WZ_zl2_id=tightElectrons_id[2]
+            WZ_wl_id=tightElectrons_id[0]
+	#two combination 0+1 or 0+2
+	else:
+	  if abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[0]
+            WZ_zl2_id=tightElectrons_id[1]
+            WZ_wl_id=tightElectrons_id[2]
+	  if abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)>abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876) and abs((tightElectrons[0]+tightElectrons[2]).M()-91.1876)<15:
+	    WZ_region=4
+            WZ_zl1_id=tightElectrons_id[0]
+            WZ_zl2_id=tightElectrons_id[2]
+            WZ_wl_id=tightElectrons_id[1]
+	
+    self.out.fillBranch("WZ_region", WZ_region)
+    self.out.fillBranch("WZ_zl1_id", WZ_zl1_id)
+    self.out.fillBranch("WZ_zl2_id", WZ_zl2_id)
+    self.out.fillBranch("WZ_wl_id", WZ_wl_id)
+    
+
+    #  DDDD   YY      YY  (opposite sign) region: two opposite sign lepton, with |mll-91.1876|<15
+    #  D   D    YY  YY   
+    #  D    D     YY
+    #  D   D      YY
+    #  DDDD       YY
+
+    #DY region lepton number selections
+    DY_nl=False
+    #DY region b-jet selection
+    DY_nb=False
+    #DY region tag, 0: fail to pass the DY selection, 1:2 muon, 2:1 muon, 3:0 muon
+    DY_region=0
+    DY_l1_id=-1
+    DY_l2_id=-1
+
+    # the two leptons with pt >20, 3th lepton veto
+    if len(tightLeptons)==2 and len(looseLeptons)==0:
+      DY_nl=True
+    # no bjet
+    if DY_nl and tightJets_b_DeepCSVmedium_id[0]==-1:
+      DY_nb=True
+    if DY_nb:
+      # 2 muons case
+      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==0 and abs((tightMuons[0]+tightMuons[1]).M()-91.1876)<15:
+	DY_region=1
+	DY_l1_id=tightMuons_id[0]
+	DY_l2_id=tightMuons_id[1]
+      # 2 eles case
+      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==0 and abs((tightElectrons[0]+tightElectrons[1]).M()-91.1876)<15:
+	DY_region=3
+        DY_l1_id=tightElectrons_id[0]
+        DY_l2_id=tightElectrons_id[1]
+      # 1 ele case
+      if len(tightElectrons)==1 and (sign(tightMuons_pdgid[0])+sign(tightElectrons_pdgid[0]))==0 and (tightElectrons[0]+tightMuons[0]).M()>30:
+	DY_region=2
+        DY_l1_id=tightMuons_id[0]
+        DY_l2_id=tightElectrons_id[0]
+    self.out.fillBranch("DY_region", DY_region)
+    self.out.fillBranch("DY_l1_id", DY_l1_id)
+    self.out.fillBranch("DY_l2_id", DY_l2_id)
+
+    return True
+
+TTC2016 = lambda: TTCProducer("2016")
+TTC2017 = lambda: TTCProducer("2017")
+TTC2018 = lambda: TTCProducer("2018")

@@ -1,0 +1,9 @@
+# this is a comment
+keep *
+drop nFatJet*
+drop FatJet_area*
+drop nSubJet*
+drop SubJet*
+drop nTrigObj*
+drop TrigObj*
+drop L1*
