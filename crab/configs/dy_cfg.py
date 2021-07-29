@@ -16,7 +16,8 @@ config.JobType.inputFiles = ['crab_script.py', '../scripts/haddnano.py','keep_an
 config.JobType.sendPythonFolder = True
 
 config.section_("Data")
-config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer19UL17NanoAODv2-106X_mc2017_realistic_v8-v1/NANOAODSIM'
+#config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer19UL17NanoAODv2-106X_mc2017_realistic_v8-v1/NANOAODSIM'
+config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'EventAwareLumiBased'
@@ -26,4 +27,4 @@ config.Data.publication = False
 config.Data.outputDatasetTag = 'DY'
 
 config.section_("Site")
-config.Site.storageSite = "T2_CH_CERN"
+config.Site.storageSite = "T3_CH_CERNBOX"

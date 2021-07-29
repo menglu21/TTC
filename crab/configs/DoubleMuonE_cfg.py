@@ -10,7 +10,7 @@ config.section_("JobType")
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
-config.JobType.scriptExe = 'crab_script_data.sh'
+config.JobType.scriptExe = 'crab_script_dataE.sh'
 # hadd nano will not be needed once nano tools are in cmssw
 config.JobType.inputFiles = ['crab_script.py', '../scripts/haddnano.py','keep_and_drop.txt','Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt']
 config.JobType.sendPythonFolder = True
@@ -25,4 +25,5 @@ config.Data.publication = False
 config.Data.outputDatasetTag = 'DoubleMuon_E'
 
 config.section_("Site")
-config.Site.storageSite = "T2_CH_CERN"
+#config.Site.storageSite = "T2_CH_CERN"
+config.Site.storageSite = "T3_CH_CERNBOX"

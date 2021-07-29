@@ -67,6 +67,8 @@ class TTCProducer(Module):
     self.out.branch("DY_z_eta", "F")
     self.out.branch("DY_z_phi", "F")
     self.out.branch("DY_drll", "F")
+    self.out.branch("tightJets_id_in24","I",lenVar="nJet")
+    self.out.branch("tightJets_id_in47","I",lenVar="nJet")
     self.out.branch("tightJets_nob_CSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_b_CSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_nob_DeepCSVmedium_id","I",lenVar="nJet")
@@ -93,7 +95,7 @@ class TTCProducer(Module):
 
     self.out.fillBranch("HLT_passEle32WPTight",HLT_passEle32WPTight)
 
-    # total number of ele+muon, currently require at least 2 leptons
+    # total number of ele+muon, currently require at least 1 leptons
     if ((event.nMuon + event.nElectron) < 2): return False
 
     # Muon selection: tight cut-based ID + tight PF iso, or loose cut-based ID + loose PF iso, with pt > 20 GeV
@@ -107,7 +109,7 @@ class TTCProducer(Module):
     additional_looseMuons_id = []
     for imu in range(0, event.nMuon):
       if (muons[imu].tightId):
-        if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>15):
+        if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>15):
           muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
           tightMuons.append(muon_v4_temp.Clone())
           tightMuons_pdgid.append(muons[imu].pdgId)
@@ -152,6 +154,10 @@ class TTCProducer(Module):
     # c-tag not available in NANOAOD yet
 
     jets = Collection(event, 'Jet')
+
+    tightJets_id_in24 = []
+    tightJets_id_in47 = []
+
     tightJets_nob_CSVmedium_id = []
     tightJets_b_CSVmedium_id = []
 
@@ -160,28 +166,42 @@ class TTCProducer(Module):
 
     for ijet in range(0, event.nJet):
       if self.year=="2016":
-        if jets[ijet].jetId==7 and jets[ijet].pt>30 and abs(jets[ijet].eta)<2.4: 
-          if (jets[ijet].btagCSVV2 > 0.8838):
-            tightJets_b_CSVmedium_id.append(ijet)
-          else:tightJets_nob_CSVmedium_id.append(ijet)
-          if (jets[ijet].btagDeepB > 0.4941):
-            tightJets_b_DeepCSVmedium_id.append(ijet)
-          else:tightJets_nob_DeepCSVmedium_id.append(ijet)
+        if jets[ijet].jetId==7 and jets[ijet].pt>30:
+	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
+	    tightJets_id_in47.append(ijet)
+	  if abs(jets[ijet].eta)<2.4:
+	    tightJets_id_in24.append(ijet)
+
+            if (jets[ijet].btagCSVV2 > 0.8838):
+              tightJets_b_CSVmedium_id.append(ijet)
+            else:tightJets_nob_CSVmedium_id.append(ijet)
+            if (jets[ijet].btagDeepB > 0.4941):
+              tightJets_b_DeepCSVmedium_id.append(ijet)
+            else:tightJets_nob_DeepCSVmedium_id.append(ijet)
 
       elif (self.year=="2017" or self.year=="2018"):
-	if jets[ijet].jetId==6 and jets[ijet].pt>30 and abs(jets[ijet].eta)<2.4:
-          if (jets[ijet].btagDeepB > 0.4506):
-            tightJets_b_CSVmedium_id.append(ijet)
-          else:tightJets_nob_CSVmedium_id.append(ijet)
-          if (jets[ijet].btagDeepFlavB > 0.3040):
-            tightJets_b_DeepCSVmedium_id.append(ijet)
-          else:tightJets_nob_DeepCSVmedium_id.append(ijet)
+	if jets[ijet].jetId==6 and jets[ijet].pt>30:
+	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
+	    tightJets_id_in47.append(ijet)
+	  if abs(jets[ijet].eta)<2.4:
+            tightJets_id_in24.append(ijet)
 
+            if (jets[ijet].btagDeepB > 0.4506):
+              tightJets_b_CSVmedium_id.append(ijet)
+            else:tightJets_nob_CSVmedium_id.append(ijet)
+            if (jets[ijet].btagDeepFlavB > 0.3040):
+              tightJets_b_DeepCSVmedium_id.append(ijet)
+            else:tightJets_nob_DeepCSVmedium_id.append(ijet)
+
+    tightJets_id_in24.extend(np.zeros(event.nJet-len(tightJets_id_in24),int)-1)
+    tightJets_id_in47.extend(np.zeros(event.nJet-len(tightJets_id_in47),int)-1)
     tightJets_b_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_CSVmedium_id),int)-1)
     tightJets_nob_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_CSVmedium_id),int)-1)
     tightJets_b_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_DeepCSVmedium_id),int)-1)
     tightJets_nob_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_DeepCSVmedium_id),int)-1)
     
+    self.out.fillBranch("tightJets_id_in24",tightJets_id_in24)
+    self.out.fillBranch("tightJets_id_in47",tightJets_id_in47)
     self.out.fillBranch("tightJets_nob_CSVmedium_id",tightJets_nob_CSVmedium_id)
     self.out.fillBranch("tightJets_b_CSVmedium_id",tightJets_b_CSVmedium_id)
     self.out.fillBranch("tightJets_nob_DeepCSVmedium_id",tightJets_nob_DeepCSVmedium_id)
@@ -238,7 +258,7 @@ class TTCProducer(Module):
       ttc_jets=True
 
     if ttc_nl:
-      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26 and (tightMuons[0]+tightMuons[1]).M()>20:
+      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26:
 	ttc_region=1
 	ttc_l1_id=tightMuons_id[0]
 	ttc_l2_id=tightMuons_id[1]
@@ -250,7 +270,7 @@ class TTCProducer(Module):
 	ttc_l2_phi=tightMuons[1].Phi()
 	ttc_mll=(tightMuons[0]+tightMuons[1]).M()
 	ttc_drll=tightMuons[0].DeltaR(tightMuons[1])
-      if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24 and (tightMuons[0]+tightElectrons[0]).M()>20:
+      if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24:
 	ttc_region=2
 	ttc_l1_id=tightMuons_id[0]
 	ttc_l2_id=tightElectrons_id[0]
@@ -259,10 +279,10 @@ class TTCProducer(Module):
         ttc_l1_phi=tightMuons[0].Phi()
         ttc_l2_pt=tightElectrons[0].Pt()
         ttc_l2_eta=tightElectrons[0].Eta()
-        ttc_l2_phi=tightElectrons[1].Phi()
+        ttc_l2_phi=tightElectrons[0].Phi()
         ttc_mll=(tightMuons[0]+tightElectrons[0]).M()
         ttc_drll=tightMuons[0].DeltaR(tightElectrons[0])
-      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22 and (tightElectrons[0]+tightElectrons[1]).M()>20:
+      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22:
 	ttc_region=3
 	ttc_l1_id=tightElectrons_id[0]
 	ttc_l2_id=tightElectrons_id[1]
@@ -737,6 +757,9 @@ class TTCProducer(Module):
     self.out.fillBranch("DY_z_eta", DY_z_eta)
     self.out.fillBranch("DY_z_phi", DY_z_phi)
     self.out.fillBranch("DY_drll", DY_drll)
+
+    if not (ttc_nl or WZ_region >0 or DY_region>0):
+      return False
 
     return True
 
