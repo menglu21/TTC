@@ -31,6 +31,8 @@ class TTCProducer(Module):
     self.out.branch("ttc_region", "I")
     self.out.branch("ttc_l1_id", "I")
     self.out.branch("ttc_l2_id", "I")
+    self.out.branch("ttc_l1_pdgid", "I")
+    self.out.branch("ttc_l2_pdgid", "I")
     self.out.branch("ttc_l1_pt", "F")
     self.out.branch("ttc_l1_eta", "F")
     self.out.branch("ttc_l1_phi", "F")
@@ -44,6 +46,9 @@ class TTCProducer(Module):
     self.out.branch("WZ_zl1_id", "I")
     self.out.branch("WZ_zl2_id", "I")
     self.out.branch("WZ_wl_id", "I")
+    self.out.branch("WZ_zl1_pdgid", "I")
+    self.out.branch("WZ_zl2_pdgid", "I")
+    self.out.branch("WZ_wl_pdgid", "I")
     self.out.branch("WZ_zl1_pt", "F")
     self.out.branch("WZ_zl1_eta", "F")
     self.out.branch("WZ_zl1_phi", "F")
@@ -61,6 +66,8 @@ class TTCProducer(Module):
     self.out.branch("DY_region", "I")
     self.out.branch("DY_l1_id", "I")
     self.out.branch("DY_l2_id", "I")
+    self.out.branch("DY_l1_pdgid", "I")
+    self.out.branch("DY_l2_pdgid", "I")
     self.out.branch("DY_l1_pt", "F")
     self.out.branch("DY_l1_eta", "F")
     self.out.branch("DY_l1_phi", "F")
@@ -258,6 +265,8 @@ class TTCProducer(Module):
     ttc_region=0
     ttc_l1_id=-1
     ttc_l2_id=-1
+    ttc_l1_pdgid=-99
+    ttc_l2_pdgid=-99
     ttc_l1_pt=-99
     ttc_l1_eta=-99
     ttc_l1_phi=-99
@@ -296,6 +305,8 @@ class TTCProducer(Module):
 	ttc_region=1
 	ttc_l1_id=tightMuons_id[0]
 	ttc_l2_id=tightMuons_id[1]
+	ttc_l1_pdgid=tightMuons_pdgid[0]
+	ttc_l2_pdgid=tightMuons_pdgid[1]
 	ttc_l1_pt=tightMuons[0].Pt()
 	ttc_l1_eta=tightMuons[0].Eta()
 	ttc_l1_phi=tightMuons[0].Phi()
@@ -307,7 +318,9 @@ class TTCProducer(Module):
       if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24:
 	ttc_region=2
 	ttc_l1_id=tightMuons_id[0]
+	ttc_l1_pdgid=tightMuons_pdgid[0]
 	ttc_l2_id=tightElectrons_id[0]
+	ttc_l2_pdgid=tightElectrons_pdgid[0]
 	ttc_l1_pt=tightMuons[0].Pt()
         ttc_l1_eta=tightMuons[0].Eta()
         ttc_l1_phi=tightMuons[0].Phi()
@@ -320,6 +333,8 @@ class TTCProducer(Module):
 	ttc_region=3
 	ttc_l1_id=tightElectrons_id[0]
 	ttc_l2_id=tightElectrons_id[1]
+	ttc_l1_pdgid=tightElectrons_pdgid[0]
+	ttc_l2_pdgid=tightElectrons_pdgid[1]
 	ttc_l1_pt=tightElectrons[0].Pt()
         ttc_l1_eta=tightElectrons[0].Eta()
         ttc_l1_phi=tightElectrons[0].Phi()
@@ -336,6 +351,8 @@ class TTCProducer(Module):
     self.out.fillBranch("ttc_region", ttc_region)
     self.out.fillBranch("ttc_l1_id", ttc_l1_id)
     self.out.fillBranch("ttc_l2_id", ttc_l2_id)
+    self.out.fillBranch("ttc_l1_pdgid", ttc_l1_pdgid)
+    self.out.fillBranch("ttc_l2_pdgid", ttc_l2_pdgid)
     self.out.fillBranch("ttc_l1_pt", ttc_l1_pt) 
     self.out.fillBranch("ttc_l1_eta", ttc_l1_eta) 
     self.out.fillBranch("ttc_l1_phi", ttc_l1_phi) 
@@ -365,6 +382,9 @@ class TTCProducer(Module):
     WZ_zl1_id=-1
     WZ_zl2_id=-1
     WZ_wl_id=-1
+    WZ_zl1_pdgid=-99
+    WZ_zl2_pdgid=-99
+    WZ_wl_pdgid=-99
     WZ_zl1_pt=-99
     WZ_zl1_eta=-99
     WZ_zl1_phi=-99
@@ -407,6 +427,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[0]
             WZ_zl2_id=tightMuons_id[2]
             WZ_wl_id=tightMuons_id[1]
+            WZ_zl1_pdgid=tightMuons_pdgid[0]
+            WZ_zl2_pdgid=tightMuons_pdgid[2]
+            WZ_wl_pdgid=tightMuons_pdgid[1]
 	    WZ_zl1_pt=tightMuons[0].Pt()
 	    WZ_zl1_eta=tightMuons[0].Eta()
 	    WZ_zl1_phi=tightMuons[0].Phi()
@@ -426,6 +449,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[1]
             WZ_zl2_id=tightMuons_id[2]
             WZ_wl_id=tightMuons_id[0]
+            WZ_zl1_pdgid=tightMuons_pdgid[1]
+            WZ_zl2_pdgid=tightMuons_pdgid[2]
+            WZ_wl_pdgid=tightMuons_pdgid[0]
 	    WZ_zl1_pt=tightMuons[1].Pt()
 	    WZ_zl1_eta=tightMuons[1].Eta()
 	    WZ_zl1_phi=tightMuons[1].Phi()
@@ -446,6 +472,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[0]
             WZ_zl2_id=tightMuons_id[1]
             WZ_wl_id=tightMuons_id[2]
+            WZ_zl1_pdgid=tightMuons_pdgid[0]
+            WZ_zl2_pdgid=tightMuons_pdgid[1]
+            WZ_wl_pdgid=tightMuons_pdgid[2]
 	    WZ_zl1_pt=tightMuons[0].Pt()
 	    WZ_zl1_eta=tightMuons[0].Eta()
 	    WZ_zl1_phi=tightMuons[0].Phi()
@@ -465,6 +494,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[1]
             WZ_zl2_id=tightMuons_id[2]
             WZ_wl_id=tightMuons_id[0]
+            WZ_zl1_pdgid=tightMuons_pdgid[1]
+            WZ_zl2_pdgid=tightMuons_pdgid[2]
+            WZ_wl_pdgid=tightMuons_pdgid[0]
 	    WZ_zl1_pt=tightMuons[1].Pt()
 	    WZ_zl1_eta=tightMuons[1].Eta()
 	    WZ_zl1_phi=tightMuons[1].Phi()
@@ -485,6 +517,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[0]
             WZ_zl2_id=tightMuons_id[1]
             WZ_wl_id=tightMuons_id[2]
+            WZ_zl1_pdgid=tightMuons_pdgid[0]
+            WZ_zl2_pdgid=tightMuons_pdgid[1]
+            WZ_wl_pdgid=tightMuons_pdgid[2]
 	    WZ_zl1_pt=tightMuons[0].Pt()
 	    WZ_zl1_eta=tightMuons[0].Eta()
 	    WZ_zl1_phi=tightMuons[0].Phi()
@@ -503,6 +538,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightMuons_id[0]
             WZ_zl2_id=tightMuons_id[2]
             WZ_wl_id=tightMuons_id[1]
+            WZ_zl1_pdgid=tightMuons_pdgid[0]
+            WZ_zl2_pdgid=tightMuons_pdgid[2]
+            WZ_wl_pdgid=tightMuons_pdgid[1]
 	    WZ_zl1_pt=tightMuons[0].Pt()
 	    WZ_zl1_eta=tightMuons[0].Eta()
 	    WZ_zl1_phi=tightMuons[0].Phi()
@@ -524,6 +562,9 @@ class TTCProducer(Module):
 	  WZ_zl1_id=tightMuons_id[0]
 	  WZ_zl2_id=tightMuons_id[1]
 	  WZ_wl_id=tightElectrons_id[0]
+	  WZ_zl1_pdgid=tightMuons_pdgid[0]
+	  WZ_zl2_pdgid=tightMuons_pdgid[1]
+	  WZ_wl_pdgid=tightElectrons_pdgid[0]
 	  WZ_zl1_pt=tightMuons[0].Pt()
 	  WZ_zl1_eta=tightMuons[0].Eta()
 	  WZ_zl1_phi=tightMuons[0].Phi()
@@ -545,6 +586,9 @@ class TTCProducer(Module):
 	  WZ_zl1_id=tightElectrons_id[0]
 	  WZ_zl2_id=tightElectrons_id[1]
 	  WZ_wl_id=tightMuons_id[0]
+	  WZ_zl1_pdgid=tightElectrons_pdgid[0]
+	  WZ_zl2_pdgid=tightElectrons_pdgid[1]
+	  WZ_wl_pdgid=tightMuons_pdgid[0]
 	  WZ_zl1_pt=tightElectrons[0].Pt()
 	  WZ_zl1_eta=tightElectrons[0].Eta()
 	  WZ_zl1_phi=tightElectrons[0].Phi()
@@ -568,6 +612,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[0]
             WZ_zl2_id=tightElectrons_id[2]
             WZ_wl_id=tightElectrons_id[1]
+            WZ_zl1_pdgid=tightElectrons_pdgid[0]
+            WZ_zl2_pdgid=tightElectrons_pdgid[2]
+            WZ_wl_pdgid=tightElectrons_pdgid[1]
 	    WZ_zl1_pt=tightElectrons[0].Pt()
 	    WZ_zl1_eta=tightElectrons[0].Eta()
 	    WZ_zl1_phi=tightElectrons[0].Phi()
@@ -586,6 +633,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[1]
             WZ_zl2_id=tightElectrons_id[2]
             WZ_wl_id=tightElectrons_id[0]
+            WZ_zl1_pdgid=tightElectrons_pdgid[1]
+            WZ_zl2_pdgid=tightElectrons_pdgid[2]
+            WZ_wl_pdgid=tightElectrons_pdgid[0]
 	    WZ_zl1_pt=tightElectrons[1].Pt()
 	    WZ_zl1_eta=tightElectrons[1].Eta()
 	    WZ_zl1_phi=tightElectrons[1].Phi()
@@ -606,6 +656,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[0]
             WZ_zl2_id=tightElectrons_id[1]
             WZ_wl_id=tightElectrons_id[2]
+            WZ_zl1_pdgid=tightElectrons_pdgid[0]
+            WZ_zl2_pdgid=tightElectrons_pdgid[1]
+            WZ_wl_pdgid=tightElectrons_pdgid[2]
 	    WZ_zl1_pt=tightElectrons[0].Pt()
 	    WZ_zl1_eta=tightElectrons[0].Eta()
 	    WZ_zl1_phi=tightElectrons[0].Phi()
@@ -624,6 +677,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[1]
             WZ_zl2_id=tightElectrons_id[2]
             WZ_wl_id=tightElectrons_id[0]
+            WZ_zl1_pdgid=tightElectrons_pdgid[1]
+            WZ_zl2_pdgid=tightElectrons_pdgid[2]
+            WZ_wl_pdgid=tightElectrons_pdgid[0]
 	    WZ_zl1_pt=tightElectrons[1].Pt()
 	    WZ_zl1_eta=tightElectrons[1].Eta()
 	    WZ_zl1_phi=tightElectrons[1].Phi()
@@ -644,6 +700,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[0]
             WZ_zl2_id=tightElectrons_id[1]
             WZ_wl_id=tightElectrons_id[2]
+            WZ_zl1_pdgid=tightElectrons_pdgid[0]
+            WZ_zl2_pdgid=tightElectrons_pdgid[1]
+            WZ_wl_pdgid=tightElectrons_pdgid[2]
 	    WZ_zl1_pt=tightElectrons[0].Pt()
 	    WZ_zl1_eta=tightElectrons[0].Eta()
 	    WZ_zl1_phi=tightElectrons[0].Phi()
@@ -662,6 +721,9 @@ class TTCProducer(Module):
             WZ_zl1_id=tightElectrons_id[0]
             WZ_zl2_id=tightElectrons_id[2]
             WZ_wl_id=tightElectrons_id[1]
+            WZ_zl1_pdgid=tightElectrons_pdgid[0]
+            WZ_zl2_pdgid=tightElectrons_pdgid[2]
+            WZ_wl_pdgid=tightElectrons_pdgid[1]
 	    WZ_zl1_pt=tightElectrons[0].Pt()
 	    WZ_zl1_eta=tightElectrons[0].Eta()
 	    WZ_zl1_phi=tightElectrons[0].Phi()
@@ -680,6 +742,9 @@ class TTCProducer(Module):
     self.out.fillBranch("WZ_zl1_id", WZ_zl1_id)
     self.out.fillBranch("WZ_zl2_id", WZ_zl2_id)
     self.out.fillBranch("WZ_wl_id", WZ_wl_id)
+    self.out.fillBranch("WZ_zl1_pdgid", WZ_zl1_pdgid)
+    self.out.fillBranch("WZ_zl2_pdgid", WZ_zl2_pdgid)
+    self.out.fillBranch("WZ_wl_pdgid", WZ_wl_pdgid)
     self.out.fillBranch("WZ_zl1_pt", WZ_zl1_pt)
     self.out.fillBranch("WZ_zl1_eta", WZ_zl1_eta)
     self.out.fillBranch("WZ_zl1_phi", WZ_zl1_phi)
@@ -710,6 +775,8 @@ class TTCProducer(Module):
     DY_region=0
     DY_l1_id=-1
     DY_l2_id=-1
+    DY_l1_pdgid=-99
+    DY_l2_pdgid=-99
     DY_l1_pt=-99
     DY_l1_eta=-99
     DY_l1_phi=-99
@@ -734,6 +801,8 @@ class TTCProducer(Module):
 	DY_region=1
 	DY_l1_id=tightMuons_id[0]
 	DY_l2_id=tightMuons_id[1]
+	DY_l1_pdgid=tightMuons_pdgid[0]
+	DY_l2_pdgid=tightMuons_pdgid[1]
 	DY_l1_pt=tightMuons[0].Pt()
 	DY_l1_eta=tightMuons[0].Eta()
 	DY_l1_phi=tightMuons[0].Phi()
@@ -750,6 +819,8 @@ class TTCProducer(Module):
 	DY_region=3
         DY_l1_id=tightElectrons_id[0]
         DY_l2_id=tightElectrons_id[1]
+        DY_l1_pdgid=tightElectrons_pdgid[0]
+        DY_l2_pdgid=tightElectrons_pdgid[1]
 	DY_l1_pt=tightElectrons[0].Pt()
 	DY_l1_eta=tightElectrons[0].Eta()
 	DY_l1_phi=tightElectrons[0].Phi()
@@ -766,6 +837,8 @@ class TTCProducer(Module):
 	DY_region=2
         DY_l1_id=tightMuons_id[0]
         DY_l2_id=tightElectrons_id[0]
+        DY_l1_pdgid=tightMuons_pdgid[0]
+        DY_l2_pdgid=tightElectrons_pdgid[0]
 	DY_l1_pt=tightLeptons[0].Pt()
 	DY_l1_eta=tightLeptons[0].Eta()
 	DY_l1_phi=tightLeptons[0].Phi()
@@ -781,6 +854,8 @@ class TTCProducer(Module):
     self.out.fillBranch("DY_region", DY_region)
     self.out.fillBranch("DY_l1_id", DY_l1_id)
     self.out.fillBranch("DY_l2_id", DY_l2_id)
+    self.out.fillBranch("DY_l1_pdgid", DY_l1_pdgid)
+    self.out.fillBranch("DY_l2_pdgid", DY_l2_pdgid)
     self.out.fillBranch("DY_l1_pt", DY_l1_pt)
     self.out.fillBranch("DY_l1_eta", DY_l1_eta)
     self.out.fillBranch("DY_l1_phi", DY_l1_phi)
