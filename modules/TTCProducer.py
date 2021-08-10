@@ -20,6 +20,10 @@ class TTCProducer(Module):
   def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
     self.out = wrappedOutputTree
     self.out.branch("HLT_passEle32WPTight", "I")
+    self.out.branch("n_tight_muon", "I")
+    self.out.branch("n_loose_muon", "I")
+    self.out.branch("n_tight_ele", "I")
+    self.out.branch("n_loose_ele", "I")
     self.out.branch("ttc_nl", "B")
     self.out.branch("ttc_jets", "B")
     self.out.branch("n_bjet", "I")
@@ -35,6 +39,7 @@ class TTCProducer(Module):
     self.out.branch("ttc_l2_phi", "F")
     self.out.branch("ttc_mll", "F")
     self.out.branch("ttc_drll", "F")
+    self.out.branch("ttc_met", "F")
     self.out.branch("WZ_region", "I")
     self.out.branch("WZ_zl1_id", "I")
     self.out.branch("WZ_zl2_id", "I")
@@ -73,6 +78,12 @@ class TTCProducer(Module):
     self.out.branch("tightJets_b_CSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_nob_DeepCSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_b_DeepCSVmedium_id","I",lenVar="nJet")
+    if event.nElectron>0:
+      self.out.branch("tightElectrons_id","I",lenVar="nElectron")
+      self.out.branch("additional_vetoElectrons_id","I",lenVar="nElectron")
+    if event.nMuon>0:
+      self.out.branch("tightMuons_id","I",lenVar="nMuon")
+      self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
 
   def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -121,6 +132,15 @@ class TTCProducer(Module):
           additional_looseMuons_pdgid.append(muons[imu].pdgId)
           additional_looseMuons_id.append(imu)
 
+    n_tight_muon = len(tightMuons)
+    n_loose_muon = len(additional_looseMuons)
+    tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
+    additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
+    self.out.fillBranch("n_tight_muon", n_tight_muon)
+    self.out.fillBranch("n_loose_muon", n_loose_muon)
+    self.out.fillBranch("tightMuons_id", tightMuons_id)
+    self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
+
     # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 15 GeV
     electrons = Collection(event, 'Electron')
     electron_v4_temp=TLorentzVector()
@@ -143,6 +163,15 @@ class TTCProducer(Module):
           additional_vetoElectrons.append(electron_v4_temp.Clone())
           additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
           additional_vetoElectrons_id.append(iele)
+
+    n_tight_ele = len(tightElectrons)
+    n_loose_ele = len(additional_vetoElectrons)
+    tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
+    additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
+    self.out.fillBranch("n_tight_ele", n_tight_ele)
+    self.out.fillBranch("n_loose_ele", n_loose_ele)
+    self.out.fillBranch("tightElectrons_id", tightElectrons_id)
+    self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
 
     # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
     # tight ak4 jets, 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
@@ -199,7 +228,7 @@ class TTCProducer(Module):
     tightJets_nob_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_CSVmedium_id),int)-1)
     tightJets_b_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_DeepCSVmedium_id),int)-1)
     tightJets_nob_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_nob_DeepCSVmedium_id),int)-1)
-    
+
     self.out.fillBranch("tightJets_id_in24",tightJets_id_in24)
     self.out.fillBranch("tightJets_id_in47",tightJets_id_in47)
     self.out.fillBranch("tightJets_nob_CSVmedium_id",tightJets_nob_CSVmedium_id)
@@ -240,6 +269,7 @@ class TTCProducer(Module):
     ttc_l3_phi=-99
     ttc_mll=-99
     ttc_drll=-99
+    ttc_met=-99
     
     # the two leptons with pt >30/20, 3th lepton veto
     if len(tightLeptons)==2 and tightLeptons[0].Pt()>30 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
@@ -258,6 +288,10 @@ class TTCProducer(Module):
       ttc_jets=True
 
     if ttc_nl:
+      if self.is_mc:
+        ttc_met=event.MET_T1Smear_pt
+      else:
+        ttc_met=event.MET_T1_pt
       if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26:
 	ttc_region=1
 	ttc_l1_id=tightMuons_id[0]
@@ -310,6 +344,7 @@ class TTCProducer(Module):
     self.out.fillBranch("ttc_l2_phi", ttc_l2_phi) 
     self.out.fillBranch("ttc_mll",ttc_mll) 
     self.out.fillBranch("ttc_drll",ttc_drll) 
+    self.out.fillBranch("ttc_met", ttc_met)
 
     # WW     WWW     WW ZZZZZZZZZ   region: only 3 tight leptons, no b-jet, mll>4, |Z-91.1876|<15
     # WW     WWW     WW       ZZ            MET>30
