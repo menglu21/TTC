@@ -792,10 +792,7 @@ class TTCProducer(Module):
     # the two leptons with pt >20, 3th lepton veto
     if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
       DY_nl=True
-    # no bjet
-    if DY_nl and tightJets_b_DeepCSVmedium_id[0]==-1:
-      DY_nb=True
-    if DY_nb:
+    if DY_nl:
       # 2 muons case
       if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==0:
 	DY_region=1
