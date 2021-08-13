@@ -25,12 +25,8 @@ class TTCProducer(Module):
     self.out.branch("n_tight_ele", "I")
     self.out.branch("n_loose_ele", "I")
     self.out.branch("n_tight_jet", "I")
-    self.out.branch("n_bjet_CVS", "I")
     self.out.branch("n_bjet_DeepB", "I")
-    self.out.branch("n_cjet_CVS_medium", "I")
     self.out.branch("n_cjet_DeepB_medium", "I")
-    self.out.branch("n_cjet_CVS_loose", "I")
-    self.out.branch("n_cjet_DeepB_loose", "I")
     self.out.branch("j1_pt", "F")
     self.out.branch("j1_eta", "F")
     self.out.branch("j1_phi", "F")
@@ -47,14 +43,6 @@ class TTCProducer(Module):
     self.out.branch("j4_eta", "F")
     self.out.branch("j4_phi", "F")
     self.out.branch("j4_mass", "F")
-    self.out.branch("CSVB_j1_pt", "F")
-    self.out.branch("CSVB_j1_eta", "F")
-    self.out.branch("CSVB_j1_phi", "F")
-    self.out.branch("CSVB_j1_mass", "F")
-    self.out.branch("CSVB_j2_pt", "F")
-    self.out.branch("CSVB_j2_eta", "F")
-    self.out.branch("CSVB_j2_phi", "F")
-    self.out.branch("CSVB_j2_mass", "F")
     self.out.branch("DeepB_j1_pt", "F")
     self.out.branch("DeepB_j1_eta", "F")
     self.out.branch("DeepB_j1_phi", "F")
@@ -63,13 +51,6 @@ class TTCProducer(Module):
     self.out.branch("DeepB_j2_eta", "F")
     self.out.branch("DeepB_j2_phi", "F")
     self.out.branch("DeepB_j2_mass", "F")
-    self.out.branch("CSVC_medium_j1_eta", "F")
-    self.out.branch("CSVC_medium_j1_phi", "F")
-    self.out.branch("CSVC_medium_j1_mass", "F")
-    self.out.branch("CSVC_medium_j2_pt", "F")
-    self.out.branch("CSVC_medium_j2_eta", "F")
-    self.out.branch("CSVC_medium_j2_phi", "F")
-    self.out.branch("CSVC_medium_j2_mass", "F")
     self.out.branch("DeepC_medium_j1_pt", "F")
     self.out.branch("DeepC_medium_j1_eta", "F")
     self.out.branch("DeepC_medium_j1_phi", "F")
@@ -78,21 +59,6 @@ class TTCProducer(Module):
     self.out.branch("DeepC_medium_j2_eta", "F")
     self.out.branch("DeepC_medium_j2_phi", "F")
     self.out.branch("DeepC_medium_j2_mass", "F")
-    self.out.branch("CSVC_loose_j1_eta", "F")
-    self.out.branch("CSVC_loose_j1_phi", "F")
-    self.out.branch("CSVC_loose_j1_mass", "F")
-    self.out.branch("CSVC_loose_j2_pt", "F")
-    self.out.branch("CSVC_loose_j2_eta", "F")
-    self.out.branch("CSVC_loose_j2_phi", "F")
-    self.out.branch("CSVC_loose_j2_mass", "F")
-    self.out.branch("DeepC_loose_j1_pt", "F")
-    self.out.branch("DeepC_loose_j1_eta", "F")
-    self.out.branch("DeepC_loose_j1_phi", "F")
-    self.out.branch("DeepC_loose_j1_mass", "F")
-    self.out.branch("DeepC_loose_j2_pt", "F")
-    self.out.branch("DeepC_loose_j2_eta", "F")
-    self.out.branch("DeepC_loose_j2_phi", "F")
-    self.out.branch("DeepC_loose_j2_mass", "F")
     self.out.branch("ttc_nl", "B")
     self.out.branch("ttc_nl", "B")
     self.out.branch("ttc_nl", "B")
@@ -135,12 +101,15 @@ class TTCProducer(Module):
     self.out.branch("WZ_zl1_pt", "F")
     self.out.branch("WZ_zl1_eta", "F")
     self.out.branch("WZ_zl1_phi", "F")
+    self.out.branch("WZ_zl1_mass", "F")
     self.out.branch("WZ_zl2_pt", "F")
     self.out.branch("WZ_zl2_eta", "F")
     self.out.branch("WZ_zl2_phi", "F")
+    self.out.branch("WZ_zl2_mass", "F")
     self.out.branch("WZ_l3_pt", "F")
     self.out.branch("WZ_l3_eta", "F")
     self.out.branch("WZ_l3_phi", "F")
+    self.out.branch("WZ_l3_mass", "F")
     self.out.branch("WZ_Z_mass", "F")
     self.out.branch("WZ_Z_pt", "F")
     self.out.branch("WZ_Z_eta", "F")
@@ -154,9 +123,11 @@ class TTCProducer(Module):
     self.out.branch("DY_l1_pt", "F")
     self.out.branch("DY_l1_eta", "F")
     self.out.branch("DY_l1_phi", "F")
+    self.out.branch("DY_l1_mass", "F")
     self.out.branch("DY_l2_pt", "F")
     self.out.branch("DY_l2_eta", "F")
     self.out.branch("DY_l2_phi", "F")
+    self.out.branch("DY_l2_mass", "F")
     self.out.branch("DY_z_mass", "F")
     self.out.branch("DY_z_pt", "F")
     self.out.branch("DY_z_eta", "F")
@@ -164,19 +135,12 @@ class TTCProducer(Module):
     self.out.branch("DY_drll", "F")
     self.out.branch("tightJets_id_in24","I",lenVar="nJet")
     self.out.branch("tightJets_id_in47","I",lenVar="nJet")
-    self.out.branch("tightJets_b_CSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_b_DeepCSVmedium_id","I",lenVar="nJet")
-    self.out.branch("tightJets_c_CSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_c_DeepCSVmedium_id","I",lenVar="nJet")
-    self.out.branch("tightJets_c_CSVloose_id","I",lenVar="nJet")
-    self.out.branch("tightJets_c_DeepCSVloose_id","I",lenVar="nJet")
-
-    if event.nElectron>0:
-      self.out.branch("tightElectrons_id","I",lenVar="nElectron")
-      self.out.branch("additional_vetoElectrons_id","I",lenVar="nElectron")
-    if event.nMuon>0:
-      self.out.branch("tightMuons_id","I",lenVar="nMuon")
-      self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
+    self.out.branch("tightElectrons_id","I",lenVar="nElectron")
+    self.out.branch("additional_vetoElectrons_id","I",lenVar="nElectron")
+    self.out.branch("tightMuons_id","I",lenVar="nMuon")
+    self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
 
   def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -296,14 +260,6 @@ class TTCProducer(Module):
     j4_eta=-99
     j4_phi=-99
     j4_mass=-99
-    CSVB_j1_pt=-99
-    CSVB_j1_eta=-99
-    CSVB_j1_phi=-99
-    CSVB_j1_mass=-99
-    CSVB_j2_pt=-99
-    CSVB_j2_eta=-99
-    CSVB_j2_phi=-99
-    CSVB_j2_mass=-99
     DeepB_j1_pt=-99
     DeepB_j1_eta=-99
     DeepB_j1_phi=-99
@@ -312,14 +268,6 @@ class TTCProducer(Module):
     DeepB_j2_eta=-99
     DeepB_j2_phi=-99
     DeepB_j2_mass=-99
-    CSVC_medium_j1_pt=-99
-    CSVC_medium_j1_eta=-99
-    CSVC_medium_j1_phi=-99
-    CSVC_medium_j1_mass=-99
-    CSVC_medium_j2_pt=-99
-    CSVC_medium_j2_eta=-99
-    CSVC_medium_j2_phi=-99
-    CSVC_medium_j2_mass=-99
     DeepC_medium_j1_pt=-99
     DeepC_medium_j1_eta=-99
     DeepC_medium_j1_phi=-99
@@ -328,33 +276,13 @@ class TTCProducer(Module):
     DeepC_medium_j2_eta=-99
     DeepC_medium_j2_phi=-99
     DeepC_medium_j2_mass=-99
-    CSVC_loose_j1_pt=-99
-    CSVC_loose_j1_eta=-99
-    CSVC_loose_j1_phi=-99
-    CSVC_loose_j1_mass=-99
-    CSVC_loose_j2_pt=-99
-    CSVC_loose_j2_eta=-99
-    CSVC_loose_j2_phi=-99
-    CSVC_loose_j2_mass=-99
-    DeepC_loose_j1_pt=-99
-    DeepC_loose_j1_eta=-99
-    DeepC_loose_j1_phi=-99
-    DeepC_loose_j1_mass=-99
-    DeepC_loose_j2_pt=-99
-    DeepC_loose_j2_eta=-99
-    DeepC_loose_j2_phi=-99
-    DeepC_loose_j2_mass=-99
 
     tightJets_id_in24 = []
     tightJets_id_in47 = []
 
-    tightJets_b_CSVmedium_id = []
     tightJets_b_DeepCSVmedium_id = []
 
-    tightJets_c_CSVmedium_id = []
     tightJets_c_DeepCSVmedium_id = []
-    tightJets_c_CSVloose_id = []
-    tightJets_c_DeepCSVloose_id = []
 
     for ijet in range(0, event.nJet):
       if self.year=="2016":
@@ -364,8 +292,6 @@ class TTCProducer(Module):
 	  if abs(jets[ijet].eta)<2.4:
 	    tightJets_id_in24.append(ijet)
 
-            if (jets[ijet].btagCSVV2 > 0.8838):
-              tightJets_b_CSVmedium_id.append(ijet)
             if (jets[ijet].btagDeepB > 0.4941):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
@@ -376,40 +302,22 @@ class TTCProducer(Module):
 	  if abs(jets[ijet].eta)<2.4:
             tightJets_id_in24.append(ijet)
 
-            if (jets[ijet].btagDeepB > 0.4506):
-              tightJets_b_CSVmedium_id.append(ijet)
             if (jets[ijet].btagDeepFlavB > 0.3040):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
     for ijet in range(0, event.nJet):
       if not (ijet in tightJets_id_in24):continue
-      if (ijet in tightJets_b_CSVmedium_id) or (ijet in tightJets_b_DeepCSVmedium_id):continue
+      if (ijet in tightJets_b_DeepCSVmedium_id):continue
       #mudium WP
-      if jets[ijet].btagDeepCvL>0.144 and jets[ijet].btagDeepCvB<0.29:
-	tightJets_c_CSVmedium_id.append(ijet)
       if jets[ijet].btagDeepFlavCvL>0.085 and jets[ijet].btagDeepFlavCvB<0.34:
 	tightJets_c_DeepCSVmedium_id.append(ijet)
-      #loose WP
-      if jets[ijet].btagDeepCvL>0.04 and jets[ijet].btagDeepCvB<0.345:
-	tightJets_c_CSVloose_id.append(ijet)
-      if jets[ijet].btagDeepFlavCvL>0.03 and jets[ijet].btagDeepFlavCvB<0.4:
-	tightJets_c_DeepCSVloose_id.append(ijet)
       
-
     n_tight_jet = len(tightJets_id_in24)
-    n_bjet_CVS = len(tightJets_b_CSVmedium_id)
     n_bjet_DeepB = len(tightJets_b_DeepCSVmedium_id)
-    n_cjet_CVS_medium = len(tightJets_c_CSVmedium_id)
     n_cjet_DeepB_medium = len(tightJets_c_DeepCSVmedium_id)
-    n_cjet_CVS_loose = len(tightJets_c_CSVloose_id)
-    n_cjet_DeepB_loose = len(tightJets_c_DeepCSVloose_id)
     self.out.fillBranch("n_tight_jet",n_tight_jet)
-    self.out.fillBranch("n_bjet_CVS",n_bjet_CVS)
     self.out.fillBranch("n_bjet_DeepB",n_bjet_DeepB)
-    self.out.fillBranch("n_cjet_CVS_medium",n_cjet_CVS_medium)
     self.out.fillBranch("n_cjet_DeepB_medium",n_cjet_DeepB_medium)
-    self.out.fillBranch("n_cjet_CVS_loose",n_cjet_CVS_loose)
-    self.out.fillBranch("n_cjet_DeepB_loose",n_cjet_DeepB_loose)
 
     if n_tight_jet==4:
       j4_pt=event.Jet_pt_nom[tightJets_id_in24[3]]
@@ -456,21 +364,6 @@ class TTCProducer(Module):
       j1_phi=event.Jet_phi[tightJets_id_in24[0]]
       j1_mass=event.Jet_mass_nom[tightJets_id_in24[0]]
 
-    if n_bjet_CVS==2:
-      CSVB_j1_pt=event.Jet_pt_nom[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_eta=event.Jet_eta[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_phi=event.Jet_phi[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_mass=event.Jet_mass_nom[tightJets_b_CSVmedium_id[0]]
-      CSVB_j2_pt=event.Jet_pt_nom[tightJets_b_CSVmedium_id[1]]
-      CSVB_j2_eta=event.Jet_eta[tightJets_b_CSVmedium_id[1]]
-      CSVB_j2_phi=event.Jet_phi[tightJets_b_CSVmedium_id[1]]
-      CSVB_j2_mass=event.Jet_mass_nom[tightJets_b_CSVmedium_id[1]]
-    if n_bjet_CVS==1:
-      CSVB_j1_pt=event.Jet_pt_nom[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_eta=event.Jet_eta[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_phi=event.Jet_phi[tightJets_b_CSVmedium_id[0]]
-      CSVB_j1_mass=event.Jet_mass_nom[tightJets_b_CSVmedium_id[0]]
-      
     if n_bjet_DeepB==2:
       DeepB_j1_pt=event.Jet_pt_nom[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_eta=event.Jet_eta[tightJets_b_DeepCSVmedium_id[0]]
@@ -480,26 +373,11 @@ class TTCProducer(Module):
       DeepB_j2_eta=event.Jet_eta[tightJets_b_DeepCSVmedium_id[1]]
       DeepB_j2_phi=event.Jet_phi[tightJets_b_DeepCSVmedium_id[1]]
       DeepB_j2_mass=event.Jet_mass_nom[tightJets_b_DeepCSVmedium_id[1]]
-    if n_bjet_CVS==1:
+    if n_bjet_DeepB==1:
       DeepB_j1_pt=event.Jet_pt_nom[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_eta=event.Jet_eta[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_phi=event.Jet_phi[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_mass=event.Jet_mass_nom[tightJets_b_DeepCSVmedium_id[0]]
-
-    if n_cjet_CVS_medium==2:
-      CSVC_medium_j1_pt=event.Jet_pt_nom[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_eta=event.Jet_eta[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_phi=event.Jet_phi[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_mass=event.Jet_mass_nom[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j2_pt=event.Jet_pt_nom[tightJets_c_CSVmedium_id[1]]
-      CSVC_medium_j2_eta=event.Jet_eta[tightJets_c_CSVmedium_id[1]]
-      CSVC_medium_j2_phi=event.Jet_phi[tightJets_c_CSVmedium_id[1]]
-      CSVC_medium_j2_mass=event.Jet_mass_nom[tightJets_c_CSVmedium_id[1]]
-    if n_cjet_CVS_medium==1:
-      CSVC_medium_j1_pt=event.Jet_pt_nom[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_eta=event.Jet_eta[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_phi=event.Jet_phi[tightJets_c_CSVmedium_id[0]]
-      CSVC_medium_j1_mass=event.Jet_mass_nom[tightJets_c_CSVmedium_id[0]]
 
     if n_cjet_DeepB_medium==2:
       DeepC_medium_j1_pt=event.Jet_pt_nom[tightJets_c_DeepCSVmedium_id[0]]
@@ -515,36 +393,6 @@ class TTCProducer(Module):
       DeepC_medium_j1_eta=event.Jet_eta[tightJets_c_DeepCSVmedium_id[0]]
       DeepC_medium_j1_phi=event.Jet_phi[tightJets_c_DeepCSVmedium_id[0]]
       DeepC_medium_j1_mass=event.Jet_mass_nom[tightJets_c_DeepCSVmedium_id[0]]
-
-    if n_cjet_CVS_loose==2:
-      CSVC_loose_j1_pt=event.Jet_pt_nom[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_eta=event.Jet_eta[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_phi=event.Jet_phi[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_mass=event.Jet_mass_nom[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j2_pt=event.Jet_pt_nom[tightJets_c_CSVloose_id[1]]
-      CSVC_loose_j2_eta=event.Jet_eta[tightJets_c_CSVloose_id[1]]
-      CSVC_loose_j2_phi=event.Jet_phi[tightJets_c_CSVloose_id[1]]
-      CSVC_loose_j2_mass=event.Jet_mass_nom[tightJets_c_CSVloose_id[1]]
-    if n_cjet_CVS_loose==1:
-      CSVC_loose_j1_pt=event.Jet_pt_nom[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_eta=event.Jet_eta[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_phi=event.Jet_phi[tightJets_c_CSVloose_id[0]]
-      CSVC_loose_j1_mass=event.Jet_mass_nom[tightJets_c_CSVloose_id[0]]
-
-    if n_cjet_DeepB_loose==2:
-      DeepC_loose_j1_pt=event.Jet_pt_nom[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_eta=event.Jet_eta[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_phi=event.Jet_phi[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_mass=event.Jet_mass_nom[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j2_pt=event.Jet_pt_nom[tightJets_c_DeepCSVloose_id[1]]
-      DeepC_loose_j2_eta=event.Jet_eta[tightJets_c_DeepCSVloose_id[1]]
-      DeepC_loose_j2_phi=event.Jet_phi[tightJets_c_DeepCSVloose_id[1]]
-      DeepC_loose_j2_mass=event.Jet_mass_nom[tightJets_c_DeepCSVloose_id[1]]
-    if n_cjet_DeepB_loose==1:
-      DeepC_loose_j1_pt=event.Jet_pt_nom[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_eta=event.Jet_eta[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_phi=event.Jet_phi[tightJets_c_DeepCSVloose_id[0]]
-      DeepC_loose_j1_mass=event.Jet_mass_nom[tightJets_c_DeepCSVloose_id[0]]
 
     self.out.fillBranch("j1_pt",j1_pt)
     self.out.fillBranch("j1_eta",j1_eta)
@@ -562,14 +410,6 @@ class TTCProducer(Module):
     self.out.fillBranch("j4_eta",j4_eta)
     self.out.fillBranch("j4_phi",j4_phi)
     self.out.fillBranch("j4_mass",j4_mass)
-    self.out.fillBranch("CSVB_j1_pt",CSVB_j1_pt)
-    self.out.fillBranch("CSVB_j1_eta",CSVB_j1_eta)
-    self.out.fillBranch("CSVB_j1_phi",CSVB_j1_phi)
-    self.out.fillBranch("CSVB_j1_mass",CSVB_j1_mass)
-    self.out.fillBranch("CSVB_j2_pt",CSVB_j2_pt)
-    self.out.fillBranch("CSVB_j2_eta",CSVB_j2_eta)
-    self.out.fillBranch("CSVB_j2_phi",CSVB_j2_phi)
-    self.out.fillBranch("CSVB_j2_mass",CSVB_j2_mass)
     self.out.fillBranch("DeepB_j1_pt",DeepB_j1_pt)
     self.out.fillBranch("DeepB_j1_eta",DeepB_j1_eta)
     self.out.fillBranch("DeepB_j1_phi",DeepB_j1_phi)
@@ -578,14 +418,6 @@ class TTCProducer(Module):
     self.out.fillBranch("DeepB_j2_eta",DeepB_j2_eta)
     self.out.fillBranch("DeepB_j2_phi",DeepB_j2_phi)
     self.out.fillBranch("DeepB_j2_mass",DeepB_j2_mass)
-    self.out.fillBranch("CSVC_medium_j1_pt",CSVC_medium_j1_pt)
-    self.out.fillBranch("CSVC_medium_j1_eta",CSVC_medium_j1_eta)
-    self.out.fillBranch("CSVC_medium_j1_phi",CSVC_medium_j1_phi)
-    self.out.fillBranch("CSVC_medium_j1_mass",CSVC_medium_j1_mass)
-    self.out.fillBranch("CSVC_medium_j2_pt",CSVC_medium_j2_pt)
-    self.out.fillBranch("CSVC_medium_j2_eta",CSVC_medium_j2_eta)
-    self.out.fillBranch("CSVC_medium_j2_phi",CSVC_medium_j2_phi)
-    self.out.fillBranch("CSVC_medium_j2_mass",CSVC_medium_j2_mass)
     self.out.fillBranch("DeepC_medium_j1_pt",DeepC_medium_j1_pt)
     self.out.fillBranch("DeepC_medium_j1_eta",DeepC_medium_j1_eta)
     self.out.fillBranch("DeepC_medium_j1_phi",DeepC_medium_j1_phi)
@@ -594,40 +426,16 @@ class TTCProducer(Module):
     self.out.fillBranch("DeepC_medium_j2_eta",DeepC_medium_j2_eta)
     self.out.fillBranch("DeepC_medium_j2_phi",DeepC_medium_j2_phi)
     self.out.fillBranch("DeepC_medium_j2_mass",DeepC_medium_j2_mass)
-    self.out.fillBranch("CSVC_loose_j1_pt",CSVC_loose_j1_pt)
-    self.out.fillBranch("CSVC_loose_j1_eta",CSVC_loose_j1_eta)
-    self.out.fillBranch("CSVC_loose_j1_phi",CSVC_loose_j1_phi)
-    self.out.fillBranch("CSVC_loose_j1_mass",CSVC_loose_j1_mass)
-    self.out.fillBranch("CSVC_loose_j2_pt",CSVC_loose_j2_pt)
-    self.out.fillBranch("CSVC_loose_j2_eta",CSVC_loose_j2_eta)
-    self.out.fillBranch("CSVC_loose_j2_phi",CSVC_loose_j2_phi)
-    self.out.fillBranch("CSVC_loose_j2_mass",CSVC_loose_j2_mass)
-    self.out.fillBranch("DeepC_loose_j1_pt",DeepC_loose_j1_pt)
-    self.out.fillBranch("DeepC_loose_j1_eta",DeepC_loose_j1_eta)
-    self.out.fillBranch("DeepC_loose_j1_phi",DeepC_loose_j1_phi)
-    self.out.fillBranch("DeepC_loose_j1_mass",DeepC_loose_j1_mass)
-    self.out.fillBranch("DeepC_loose_j2_pt",DeepC_loose_j2_pt)
-    self.out.fillBranch("DeepC_loose_j2_eta",DeepC_loose_j2_eta)
-    self.out.fillBranch("DeepC_loose_j2_phi",DeepC_loose_j2_phi)
-    self.out.fillBranch("DeepC_loose_j2_mass",DeepC_loose_j2_mass)
 
     tightJets_id_in24.extend(np.zeros(event.nJet-len(tightJets_id_in24),int)-1)
     tightJets_id_in47.extend(np.zeros(event.nJet-len(tightJets_id_in47),int)-1)
-    tightJets_b_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_CSVmedium_id),int)-1)
     tightJets_b_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_b_DeepCSVmedium_id),int)-1)
-    tightJets_c_CSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_c_CSVmedium_id),int)-1)
     tightJets_c_DeepCSVmedium_id.extend(np.zeros(event.nJet-len(tightJets_c_DeepCSVmedium_id),int)-1)
-    tightJets_c_CSVloose_id.extend(np.zeros(event.nJet-len(tightJets_c_CSVloose_id),int)-1)
-    tightJets_c_DeepCSVloose_id.extend(np.zeros(event.nJet-len(tightJets_c_DeepCSVloose_id),int)-1)
 
     self.out.fillBranch("tightJets_id_in24",tightJets_id_in24)
     self.out.fillBranch("tightJets_id_in47",tightJets_id_in47)
-    self.out.fillBranch("tightJets_b_CSVmedium_id",tightJets_b_CSVmedium_id)
     self.out.fillBranch("tightJets_b_DeepCSVmedium_id",tightJets_b_DeepCSVmedium_id)
-    self.out.fillBranch("tightJets_c_CSVmedium_id",tightJets_c_CSVmedium_id)
     self.out.fillBranch("tightJets_c_DeepCSVmedium_id",tightJets_c_DeepCSVmedium_id)
-    self.out.fillBranch("tightJets_c_CSVloose_id",tightJets_c_CSVloose_id)
-    self.out.fillBranch("tightJets_c_DeepCSVloose_id",tightJets_c_DeepCSVloose_id)
 
     # tight leptons and additional loose leptons collection
     tightLeptons = tightMuons + tightElectrons
