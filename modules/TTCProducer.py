@@ -121,17 +121,23 @@ class TTCProducer(Module):
     self.out.branch("DY_l1_pdgid", "I")
     self.out.branch("DY_l2_pdgid", "I")
     self.out.branch("DY_l1_pt", "F")
+    self.out.branch("DY_l1_pt_raw", "F")
     self.out.branch("DY_l1_eta", "F")
     self.out.branch("DY_l1_phi", "F")
     self.out.branch("DY_l1_mass", "F")
     self.out.branch("DY_l2_pt", "F")
+    self.out.branch("DY_l2_pt_raw", "F")
     self.out.branch("DY_l2_eta", "F")
     self.out.branch("DY_l2_phi", "F")
     self.out.branch("DY_l2_mass", "F")
     self.out.branch("DY_z_mass", "F")
+    self.out.branch("DY_z_mass_raw", "F")
     self.out.branch("DY_z_pt", "F")
+    self.out.branch("DY_z_pt_raw", "F")
     self.out.branch("DY_z_eta", "F")
+    self.out.branch("DY_z_eta_raw", "F")
     self.out.branch("DY_z_phi", "F")
+    self.out.branch("DY_z_phi_raw", "F")
     self.out.branch("DY_drll", "F")
     self.out.branch("tightJets_id_in24","I",lenVar="nJet")
     self.out.branch("tightJets_id_in47","I",lenVar="nJet")
@@ -169,7 +175,9 @@ class TTCProducer(Module):
     # Muon selection: tight cut-based ID + tight PF iso, or loose cut-based ID + loose PF iso, with pt > 20 GeV
     muons = Collection(event, 'Muon')
     muon_v4_temp=TLorentzVector()
+    muon_v4_temp_raw=TLorentzVector()
     tightMuons = []
+    tightMuons_raw = []
     tightMuons_pdgid = []
     tightMuons_id = []
     additional_looseMuons = []
@@ -179,7 +187,9 @@ class TTCProducer(Module):
       if (muons[imu].tightId):
         if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>15):
           muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+          muon_v4_temp_raw.SetPtEtaPhiM(event.muon[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
           tightMuons.append(muon_v4_temp.Clone())
+          tightMuons_raw.append(muon_v4_temp_raw.Clone())
           tightMuons_pdgid.append(muons[imu].pdgId)
           tightMuons_id.append(imu)
       elif (muons[imu].looseId):
@@ -203,7 +213,9 @@ class TTCProducer(Module):
     # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 15 GeV
     electrons = Collection(event, 'Electron')
     electron_v4_temp=TLorentzVector()
+    electron_v4_temp_raw=TLorentzVector()
     tightElectrons = []
+    tightElectrons_raw = []
     tightElectrons_pdgid = []
     tightElectrons_id = []
     additional_vetoElectrons = []
@@ -211,13 +223,15 @@ class TTCProducer(Module):
     additional_vetoElectrons_id = []
     for iele in range(0, event.nElectron):
       if (electrons[iele].cutBased==4):
-        if (electrons[iele].tightCharge==2 and ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz<0.1)) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
+        if (electrons[iele].tightCharge==2 and ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
           electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          electron_v4_temp_raw.SetPtEtaPhiM(electrons[iele].pt/electrons[iele].eCorr, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           tightElectrons.append(electron_v4_temp.Clone())
+          tightElectrons_raw.append(electron_v4_temp_raw.Clone())
           tightElectrons_pdgid.append(electrons[iele].pdgId)
           tightElectrons_id.append(iele)
       elif (electrons[iele].cutBased>0):
-        if (((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz<0.1)) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
+        if (((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
           electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           additional_vetoElectrons.append(electron_v4_temp.Clone())
           additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
@@ -440,6 +454,8 @@ class TTCProducer(Module):
     # tight leptons and additional loose leptons collection
     tightLeptons = tightMuons + tightElectrons
     tightLeptons.sort(key=lambda x: x.Pt(), reverse=True)
+    tightLeptons_raw = tightMuons_raw + tightElectrons_raw
+    tightLeptons_raw.sort(key=lambda x: x.Pt(), reverse=True)
     looseLeptons = additional_looseMuons + additional_vetoElectrons
     looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
 
@@ -1092,17 +1108,23 @@ class TTCProducer(Module):
     DY_l1_pdgid=-99
     DY_l2_pdgid=-99
     DY_l1_pt=-99
+    DY_l1_pt_raw=-99
     DY_l1_eta=-99
     DY_l1_phi=-99
     DY_l1_mass=-99
     DY_l2_pt=-99
+    DY_l2_pt_raw=-99
     DY_l2_eta=-99
     DY_l2_phi=-99
     DY_l2_mass=-99
     DY_z_mass=-99
+    DY_z_mass_raw=-99
     DY_z_pt=-99
+    DY_z_pt_raw=-99
     DY_z_eta=-99
+    DY_z_eta_raw=-99
     DY_z_phi=-99
+    DY_z_phi_raw=-99
     DY_drll=-99
 
     # the two leptons with pt >20, 3th lepton veto
@@ -1129,6 +1151,12 @@ class TTCProducer(Module):
 	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
 	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
 	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+	DY_l1_pt_raw=tightMuons_raw[0].Pt()
+	DY_l2_pt_raw=tightMuons_raw[1].Pt()
+	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
       # 2 eles case
       if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==0:
 	DY_region=3
@@ -1149,6 +1177,12 @@ class TTCProducer(Module):
 	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
 	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
 	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+	DY_l1_pt_raw=tightElectrons_raw[0].Pt()
+	DY_l2_pt_raw=tightElectrons_raw[1].Pt()
+	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
       # 1 ele case
       if len(tightElectrons)==1 and (sign(tightMuons_pdgid[0])+sign(tightElectrons_pdgid[0]))==0:
 	DY_region=2
@@ -1169,6 +1203,12 @@ class TTCProducer(Module):
 	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
 	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
 	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+	DY_l1_pt_raw=tightMuons_raw[0].Pt()
+	DY_l2_pt_raw=tightElectrons_raw[0].Pt()
+	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
 
     self.out.fillBranch("DY_region", DY_region)
     self.out.fillBranch("DY_l1_id", DY_l1_id)
@@ -1176,17 +1216,23 @@ class TTCProducer(Module):
     self.out.fillBranch("DY_l1_pdgid", DY_l1_pdgid)
     self.out.fillBranch("DY_l2_pdgid", DY_l2_pdgid)
     self.out.fillBranch("DY_l1_pt", DY_l1_pt)
+    self.out.fillBranch("DY_l1_pt_raw", DY_l1_pt_raw)
     self.out.fillBranch("DY_l1_eta", DY_l1_eta)
     self.out.fillBranch("DY_l1_phi", DY_l1_phi)
     self.out.fillBranch("DY_l1_mass", DY_l1_mass)
     self.out.fillBranch("DY_l2_pt", DY_l2_pt)
+    self.out.fillBranch("DY_l2_pt_raw", DY_l2_pt_raw)
     self.out.fillBranch("DY_l2_eta", DY_l2_eta)
     self.out.fillBranch("DY_l2_phi", DY_l2_phi)
     self.out.fillBranch("DY_l2_mass", DY_l2_mass)
     self.out.fillBranch("DY_z_mass", DY_z_mass)
+    self.out.fillBranch("DY_z_mass_raw", DY_z_mass_raw)
     self.out.fillBranch("DY_z_pt", DY_z_pt)
+    self.out.fillBranch("DY_z_pt_raw", DY_z_pt_raw)
     self.out.fillBranch("DY_z_eta", DY_z_eta)
+    self.out.fillBranch("DY_z_eta_raw", DY_z_eta_raw)
     self.out.fillBranch("DY_z_phi", DY_z_phi)
+    self.out.fillBranch("DY_z_phi_raw", DY_z_phi_raw)
     self.out.fillBranch("DY_drll", DY_drll)
 
     if not (ttc_nl or WZ_region >0 or DY_region>0):
