@@ -187,7 +187,7 @@ class TTCProducer(Module):
       if (muons[imu].tightId):
         if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>15):
           muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
-          muon_v4_temp_raw.SetPtEtaPhiM(event.muon[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
+          muon_v4_temp_raw.SetPtEtaPhiM(muons[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
           tightMuons.append(muon_v4_temp.Clone())
           tightMuons_raw.append(muon_v4_temp_raw.Clone())
           tightMuons_pdgid.append(muons[imu].pdgId)
