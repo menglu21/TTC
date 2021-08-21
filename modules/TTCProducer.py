@@ -27,6 +27,7 @@ class TTCProducer(Module):
     self.out.branch("n_tight_jet", "I")
     self.out.branch("n_bjet_DeepB", "I")
     self.out.branch("n_cjet_DeepB_medium", "I")
+    self.out.branch("HT", "F")
     self.out.branch("j1_pt", "F")
     self.out.branch("j1_eta", "F")
     self.out.branch("j1_phi", "F")
@@ -78,7 +79,9 @@ class TTCProducer(Module):
     self.out.branch("ttc_l2_mass", "F")
     self.out.branch("ttc_mll", "F")
     self.out.branch("ttc_drll", "F")
+    self.out.branch("ttc_dphill", "F")
     self.out.branch("ttc_met", "F")
+    self.out.branch("ttc_met_phi", "F")
     self.out.branch("ttc_dr_l1j1", "F")
     self.out.branch("ttc_dr_l1j2", "F")
     self.out.branch("ttc_dr_l1j3", "F")
@@ -225,7 +228,7 @@ class TTCProducer(Module):
       if (electrons[iele].cutBased==4):
         if (electrons[iele].tightCharge==2 and ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
           electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
-          electron_v4_temp_raw.SetPtEtaPhiM(electrons[iele].pt/electrons[iele].eCorr, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          electron_v4_temp_raw.SetPtEtaPhiM(electrons[iele].pt/electrons[iele].eCorr, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass/electrons[iele].eCorr)
           tightElectrons.append(electron_v4_temp.Clone())
           tightElectrons_raw.append(electron_v4_temp_raw.Clone())
           tightElectrons_pdgid.append(electrons[iele].pdgId)
@@ -246,6 +249,14 @@ class TTCProducer(Module):
       additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
       self.out.fillBranch("tightElectrons_id", tightElectrons_id)
       self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
+
+    # tight leptons and additional loose leptons collection
+    tightLeptons = tightMuons + tightElectrons
+    tightLeptons.sort(key=lambda x: x.Pt(), reverse=True)
+    tightLeptons_raw = tightMuons_raw + tightElectrons_raw
+    tightLeptons_raw.sort(key=lambda x: x.Pt(), reverse=True)
+    looseLeptons = additional_looseMuons + additional_vetoElectrons
+    looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
 
     # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
     # tightLepVeto PF jets (ak4), 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
@@ -298,9 +309,17 @@ class TTCProducer(Module):
 
     tightJets_c_DeepCSVmedium_id = []
 
+    # require DeltaR between Jets and tight leptons greater than 0.4
+    jet_v4_temp=TLorentzVector()
     for ijet in range(0, event.nJet):
+      pass_jet_lep_Dr=0
+      jet_v4_temp.SetPtEtaPhiM(event.Jet_pt_nom[ijet],event.Jet_eta[ijet],event.Jet_phi[ijet],event.Jet_mass_nom[ijet])
+      for ilep in range(0,len(tightLeptons)):
+	if jet_v4_temp.DeltaR(tightLeptons[ilep])>0.4:pass_jet_lep_Dr=1
+
+      if not (pass_jet_lep_Dr>0):continue
       if self.year=="2016":
-        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>30:
+        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>20:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
@@ -309,8 +328,8 @@ class TTCProducer(Module):
             if (jets[ijet].btagDeepB > 0.4941):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
-      elif (self.year=="2017" or self.year=="2018"):
-	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
+      if (self.year=="2017"):
+	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>20:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
@@ -319,11 +338,28 @@ class TTCProducer(Module):
             if (jets[ijet].btagDeepFlavB > 0.3040):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
+      if (self.year=="2018"):
+	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>20:
+	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
+	    tightJets_id_in47.append(ijet)
+	  if abs(jets[ijet].eta)<2.4:
+            tightJets_id_in24.append(ijet)
+
+            if (jets[ijet].btagDeepFlavB > 0.2783):
+              tightJets_b_DeepCSVmedium_id.append(ijet)
+
+    HT=0
+    for ijet in range(0,len(tightJets_id_in24)):
+      HT=HT+event.Jet_pt_nom[tightJets_id_in24[ijet]]
+    self.out.fillBranch("HT",HT)
+
     for ijet in range(0, event.nJet):
       if not (ijet in tightJets_id_in24):continue
       if (ijet in tightJets_b_DeepCSVmedium_id):continue
       #mudium WP
-      if jets[ijet].btagDeepFlavCvL>0.085 and jets[ijet].btagDeepFlavCvB<0.34:
+      if self.year=="2017" and jets[ijet].btagDeepFlavCvL>0.085 and jets[ijet].btagDeepFlavCvB<0.34:
+	tightJets_c_DeepCSVmedium_id.append(ijet)
+      if self.year=="2018" and jets[ijet].btagDeepFlavCvL>0.099 and jets[ijet].btagDeepFlavCvB<0.325:
 	tightJets_c_DeepCSVmedium_id.append(ijet)
       
     n_tight_jet = len(tightJets_id_in24)
@@ -451,14 +487,6 @@ class TTCProducer(Module):
     self.out.fillBranch("tightJets_b_DeepCSVmedium_id",tightJets_b_DeepCSVmedium_id)
     self.out.fillBranch("tightJets_c_DeepCSVmedium_id",tightJets_c_DeepCSVmedium_id)
 
-    # tight leptons and additional loose leptons collection
-    tightLeptons = tightMuons + tightElectrons
-    tightLeptons.sort(key=lambda x: x.Pt(), reverse=True)
-    tightLeptons_raw = tightMuons_raw + tightElectrons_raw
-    tightLeptons_raw.sort(key=lambda x: x.Pt(), reverse=True)
-    looseLeptons = additional_looseMuons + additional_vetoElectrons
-    looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
-
     if len(tightLeptons)<2:return False
 
     #    t     t      cccc
@@ -487,7 +515,9 @@ class TTCProducer(Module):
     ttc_l2_mass=-99
     ttc_mll=-99
     ttc_drll=-99
+    ttc_dphill=-99
     ttc_met=-99
+    ttc_met_phi=-99
     ttc_dr_l1j1=-99
     ttc_dr_l1j2=-99
     ttc_dr_l1j3=-99
@@ -501,8 +531,8 @@ class TTCProducer(Module):
     ttc_mllj3=-99
     ttc_mllj4=-99
     
-    # the two leptons with pt >30/20, 3th lepton veto
-    if len(tightLeptons)==2 and tightLeptons[0].Pt()>30 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
+    # the two leptons with pt 20, 3th lepton veto
+    if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 len(looseLeptons)==0:
       ttc_nl=True
     # at least three jets
     if ttc_nl and n_tight_jet>2:
@@ -511,8 +541,10 @@ class TTCProducer(Module):
     if ttc_nl:
       if self.is_mc:
         ttc_met=event.MET_T1Smear_pt
+	ttc_met_phi=event.MET_T1Smear_phi
       else:
         ttc_met=event.MET_T1_pt
+        ttc_met_phi=event.MET_T1_phi
       if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26:
 	ttc_region=1
 	ttc_l1_id=tightMuons_id[0]
@@ -529,6 +561,7 @@ class TTCProducer(Module):
 	ttc_l2_mass=tightMuons[1].M()
 	ttc_mll=(tightMuons[0]+tightMuons[1]).M()
 	ttc_drll=tightMuons[0].DeltaR(tightMuons[1])
+	ttc_dphill=tightMuons[0].DeltaPhi(tightMuons[1])
       if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24:
 	ttc_region=2
 	ttc_l1_id=tightMuons_id[0]
@@ -545,6 +578,7 @@ class TTCProducer(Module):
         ttc_l2_mass=tightElectrons[0].M()
         ttc_mll=(tightMuons[0]+tightElectrons[0]).M()
         ttc_drll=tightMuons[0].DeltaR(tightElectrons[0])
+        ttc_dphill=tightMuons[0].DeltaPhi(tightElectrons[0])
       if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22:
 	ttc_region=3
 	ttc_l1_id=tightElectrons_id[0]
@@ -561,6 +595,7 @@ class TTCProducer(Module):
         ttc_l2_mass=tightElectrons[1].M()
         ttc_mll=(tightElectrons[0]+tightElectrons[1]).M()
         ttc_drll=tightElectrons[0].DeltaR(tightElectrons[1])
+        ttc_dphill=tightElectrons[0].DeltaPhi(tightElectrons[1])
 
     if ttc_region>0:
       l1_v4_temp=TLorentzVector()
@@ -633,7 +668,9 @@ class TTCProducer(Module):
     self.out.fillBranch("ttc_l2_mass", ttc_l2_mass)
     self.out.fillBranch("ttc_mll",ttc_mll) 
     self.out.fillBranch("ttc_drll",ttc_drll) 
+    self.out.fillBranch("ttc_dphill",ttc_dphill) 
     self.out.fillBranch("ttc_met", ttc_met)
+    self.out.fillBranch("ttc_met_phi", ttc_met_phi)
     self.out.fillBranch("ttc_dr_l1j1", ttc_dr_l1j1)
     self.out.fillBranch("ttc_dr_l1j2", ttc_dr_l1j2)
     self.out.fillBranch("ttc_dr_l1j3", ttc_dr_l1j3)
