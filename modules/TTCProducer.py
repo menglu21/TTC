@@ -532,7 +532,7 @@ class TTCProducer(Module):
     ttc_mllj4=-99
     
     # the two leptons with pt 20, 3th lepton veto
-    if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 len(looseLeptons)==0:
+    if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
       ttc_nl=True
     # at least three jets
     if ttc_nl and n_tight_jet>2:
