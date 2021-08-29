@@ -37,7 +37,7 @@ the modules (most of them are corrections) used can be seen from analysis/crab/c
 
 N.B. the egamma correction is already applied default in NanoAOD
 
-### for MC:
+#### for MC:
 
 countHistogramsModule(): store the opsitive and negative events number for weight apply
 
@@ -57,13 +57,13 @@ jmeCorrections_UL2017MC(): JetMET correction
 
 btagSF2017UL(): b tag SF
 
-### for Data:
+#### for Data:
 
 muonScaleRes2017(): muon momentum correction, i.e., the Rochester correction
 
 jmeCorrections_UL2017*(): JetMET correction
 
-1. pileup reweight (this correction is applied using the official module, so we need to update the rootfiles for pileup and do some modification on the official module. The files under others/for_pileup/ can be used directly)
+### pileup reweight (this correction is applied using the official module, so we need to update the rootfiles for pileup and do some modification on the official module. The files under others/for_pileup/ can be used directly)
 
 #### data
 
@@ -75,12 +75,10 @@ https://twiki.cern.ch/twiki/bin/view/CMS/PileupScenariosRun2
 
 move "mcPileupUL2017.root" and "PileupHistogram-goldenJSON-13tev-UL2017-99bins_withVar.root" to python/postprocessing/data/pileup/, and move "puWeightProducer.py" to python/postprocessing/modules/common/
 
-2. prefiring correction (needed files are in others/for_prefiring, can be used directly)
+### prefiring correction (needed files are in others/for_prefiring, can be used directly)
 
 details are here: Pre-firing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe#Accessing_the_UL2017_maps, in order to use the current NanoAOD module, extract separate rootfiles from https://github.com/cms-data/PhysicsTools-PatUtils/raw/master/L1PrefiringMaps.root
 
 #### data & MC
 
 move "others/for_prefiring/*.root" to NanoAODTools/data/prefire_maps/, and move "others/for_prefiring/PrefireCorr.py" to postprocessing/modules/common/
-
-   
