@@ -63,7 +63,8 @@ muonScaleRes2017(): muon momentum correction, i.e., the Rochester correction
 
 jmeCorrections_UL2017*(): JetMET correction
 
-### pileup reweight (this correction is applied using the official module, so we need to update the rootfiles for pileup and do some modification on the official module. The files under others/for_pileup/ can be used directly)
+### pileup reweight 
+(this correction is applied using the official module, so we need to update the rootfiles for pileup and do some modification on the official module. The files under others/for_pileup/ can be used directly)
 
 #### data
 
@@ -75,7 +76,8 @@ https://twiki.cern.ch/twiki/bin/view/CMS/PileupScenariosRun2
 
 move "mcPileupUL2017.root" and "PileupHistogram-goldenJSON-13tev-UL2017-99bins_withVar.root" to python/postprocessing/data/pileup/, and move "puWeightProducer.py" to python/postprocessing/modules/common/
 
-### prefiring correction (needed files are in others/for_prefiring, can be used directly)
+### prefiring correction 
+(needed files are in others/for_prefiring, can be used directly)
 
 details are here: Pre-firing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe#Accessing_the_UL2017_maps, in order to use the current NanoAOD module, extract separate rootfiles from https://github.com/cms-data/PhysicsTools-PatUtils/raw/master/L1PrefiringMaps.root
 
