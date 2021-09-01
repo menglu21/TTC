@@ -199,9 +199,9 @@ def createJMECorrector(isMC=True,
 #jmeCorrections = createJMECorrector(False, "2016", "B", "Total", True, "AK4PFchs", False)
 # include jmeCorrections() in the list of modules to run.
 ###
-jmeCorrections_UL2017MC = createJMECorrector(True, "UL2017", "B", "Total", "AK4PFchs", False)
-jmeCorrections_UL2017B = createJMECorrector(False, "UL2017", "B", "Total", "AK4PFchs", False)
-jmeCorrections_UL2017C = createJMECorrector(False, "UL2017", "C", "Total", "AK4PFchs", False)
-jmeCorrections_UL2017D = createJMECorrector(False, "UL2017", "D", "Total", "AK4PFchs", False)
-jmeCorrections_UL2017E = createJMECorrector(False, "UL2017", "E", "Total", "AK4PFchs", False)
-jmeCorrections_UL2017F = createJMECorrector(False, "UL2017", "F", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017MC = lambda : createJMECorrector(True, "UL2017", "B", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017B = lambda : createJMECorrector(False, "UL2017", "B", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017C = lambda : createJMECorrector(False, "UL2017", "C", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017D = lambda : createJMECorrector(False, "UL2017", "D", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017E = lambda : createJMECorrector(False, "UL2017", "E", "Total", "AK4PFchs", False)
+jmeCorrections_UL2017F = lambda : createJMECorrector(False, "UL2017", "F", "Total", "AK4PFchs", False)
