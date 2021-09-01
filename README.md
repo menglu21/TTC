@@ -84,3 +84,13 @@ details are here: Pre-firing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECA
 #### data & MC
 
 move "others/for_prefiring/*.root" to NanoAODTools/data/prefire_maps/, and move "others/for_prefiring/PrefireCorr.py" to postprocessing/modules/common/
+
+### 3. JME correction
+(needed files are in others/for_jme, can be used directly)
+move the *.tgz to PhysicsTools/NanoAODTools/data/jme, and move "jetmetHelperRun2.py" to PhysicsTools/NanoAODTools/python/postprocessing/modules/jme
+
+### 4. Bjet related
+(needed files are in others/for_btv, can be used directly)
+move "btagSFProducer.py" to src/PhysicsTools/NanoAODTools/python/postprocessing/modules/btv, move the *.csv to PhysicsTools/NanoAODTools/data/btagSF
+
+## After finisihing all the file moving, please remember delete the "others" directory, as the crab submission have size limit.
