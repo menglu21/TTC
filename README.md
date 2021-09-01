@@ -31,6 +31,8 @@ using the configure files under 'configs', namely,
 
 crab submit -c configs/DoubleEGB_cfg.py
 
+rm crab_DoubleEG_B/inputs/*.tgz 
+
 ## corrections
 
 the modules (most of them are corrections) used can be seen from analysis/crab/crab_script.py, 
