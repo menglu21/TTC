@@ -32,4 +32,8 @@ rm -r $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/jme/Spring16_*.tgz
 rm -r $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/jme/Summer16_*.tgz
 rm -r $WORKING_PATH/data/roccor*
 
+echo redo scram
+cd $CMSSW_BASE/src
+scram b
+
 echo "Initing Done \(ᵔᵕᵔ)/"

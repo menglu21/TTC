@@ -47,11 +47,12 @@ def prepare_crab(name,sample_type,year,era,outLFNDirBase):
         f.write('config.Data.inputDBS = "global"\n')
         if sample_type == 'MC':
             f.write('config.Data.splitting = "FileBased"\n')
+            f.write('config.Data.unitsPerJob = 1\n')
         elif sample_type == 'data':
             f.write('config.Data.splitting = "LumiBased"\n')
+            f.write('config.Data.unitsPerJob = 80\n')
         f.write('#config.Data.splitting = "EventAwareLumiBased" \n')
         # f.write('config.Data.splitting = "Automatic" \n')
-        f.write('config.Data.unitsPerJob = 80\n')
 
         if sample_type == 'MC':
             pass
