@@ -35,7 +35,7 @@ def prepare_crab(name,sample_type,year,era,outLFNDirBase):
         f.write('config.JobType.pluginName = "Analysis"\n')
         f.write('config.JobType.psetName = "PSet.py"\n')
         f.write('config.JobType.scriptExe = "./go_crab.sh" \n')
-        f.write('config.JobType.inputFiles = ["haddnano.py","TTC_postproc.py","keep_and_drop.txt"] #hadd nano will not be needed once nano tools are in cmssw \n')
+        f.write('config.JobType.inputFiles = ["./haddnano.py","./TTC_postproc.py","./keep_and_drop.txt"] #hadd nano will not be needed once nano tools are in cmssw \n')
         f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '","era=' + era + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n')
@@ -47,11 +47,12 @@ def prepare_crab(name,sample_type,year,era,outLFNDirBase):
         f.write('config.Data.inputDBS = "global"\n')
         if sample_type == 'MC':
             f.write('config.Data.splitting = "FileBased"\n')
+            f.write('config.Data.unitsPerJob = 1\n')
         elif sample_type == 'data':
             f.write('config.Data.splitting = "LumiBased"\n')
+            f.write('config.Data.unitsPerJob = 80\n')
         f.write('#config.Data.splitting = "EventAwareLumiBased" \n')
         # f.write('config.Data.splitting = "Automatic" \n')
-        f.write('config.Data.unitsPerJob = 80\n')
 
         if sample_type == 'MC':
             pass

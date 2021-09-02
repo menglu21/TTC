@@ -3,7 +3,9 @@
 ## Steps for setup:
 
 1. release CMSSW_10_6_27
-2. cd $CMSSW_BASE/src
+2. Set up NanoAOD tools
+   ```bash
+   cd $CMSSW_BASE/src
 
    git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
 
@@ -12,8 +14,11 @@
    cmsenv
 
    scram b
+   ```
 
-3. cd python/postprocessing
+3. Set up TTC codes
+   ```bash
+   cd python/postprocessing
 
    ##clone this repository
 
@@ -22,6 +27,15 @@
    cd $CMSSW_BASE/src
 
    scram b
+   ```
+    Noticed that the `crab_help.py` is written in python3, hence the `scram b` in CMSSW would leave some error message. Since this crab helper normally would not be included by other codes, you can ignore these errors.
+
+4. Substitute some outdated files with `init.sh`
+   ```bash
+   cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis
+
+   source init.sh
+   ```
 
 ## submit jobs
 
@@ -32,6 +46,8 @@ using the configure files under 'configs', namely,
 crab submit -c configs/DoubleEGB_cfg.py
 
 rm crab_DoubleEG_B/inputs/*.tgz 
+
+You can also check `crab/auto_crab_example` to run crab jobs batchly and automatically.
 
 ## corrections
 
