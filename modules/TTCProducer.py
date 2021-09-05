@@ -369,7 +369,7 @@ class TTCProducer(Module):
     self.out.fillBranch("n_bjet_DeepB",n_bjet_DeepB)
     self.out.fillBranch("n_cjet_DeepB_medium",n_cjet_DeepB_medium)
 
-    if n_tight_jet==4:
+    if n_tight_jet>3:
       j4_pt=event.Jet_pt_nom[tightJets_id_in24[3]]
       j4_eta=event.Jet_eta[tightJets_id_in24[3]]
       j4_phi=event.Jet_phi[tightJets_id_in24[3]]
@@ -414,7 +414,7 @@ class TTCProducer(Module):
       j1_phi=event.Jet_phi[tightJets_id_in24[0]]
       j1_mass=event.Jet_mass_nom[tightJets_id_in24[0]]
 
-    if n_bjet_DeepB==2:
+    if n_bjet_DeepB>1:
       DeepB_j1_pt=event.Jet_pt_nom[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_eta=event.Jet_eta[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_phi=event.Jet_phi[tightJets_b_DeepCSVmedium_id[0]]
@@ -429,7 +429,7 @@ class TTCProducer(Module):
       DeepB_j1_phi=event.Jet_phi[tightJets_b_DeepCSVmedium_id[0]]
       DeepB_j1_mass=event.Jet_mass_nom[tightJets_b_DeepCSVmedium_id[0]]
 
-    if n_cjet_DeepB_medium==2:
+    if n_cjet_DeepB_medium>1:
       DeepC_medium_j1_pt=event.Jet_pt_nom[tightJets_c_DeepCSVmedium_id[0]]
       DeepC_medium_j1_eta=event.Jet_eta[tightJets_c_DeepCSVmedium_id[0]]
       DeepC_medium_j1_phi=event.Jet_phi[tightJets_c_DeepCSVmedium_id[0]]
@@ -606,7 +606,7 @@ class TTCProducer(Module):
       j2_v4_temp=TLorentzVector()
       j3_v4_temp=TLorentzVector()
       j4_v4_temp=TLorentzVector()
-      if n_tight_jet==4:
+      if n_tight_jet>3:
 	j1_v4_temp.SetPtEtaPhiM(j1_pt,j1_eta,j1_phi,j1_mass)
 	j2_v4_temp.SetPtEtaPhiM(j2_pt,j2_eta,j2_phi,j2_mass)
 	j3_v4_temp.SetPtEtaPhiM(j3_pt,j3_eta,j3_phi,j3_mass)
