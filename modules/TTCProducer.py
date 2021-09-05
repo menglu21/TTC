@@ -319,7 +319,7 @@ class TTCProducer(Module):
 
       if not (pass_jet_lep_Dr>0):continue
       if self.year=="2016":
-        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>20:
+        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>30:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
@@ -329,7 +329,7 @@ class TTCProducer(Module):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
       if (self.year=="2017"):
-	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>20:
+	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
@@ -339,7 +339,7 @@ class TTCProducer(Module):
               tightJets_b_DeepCSVmedium_id.append(ijet)
 
       if (self.year=="2018"):
-	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>20:
+	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
