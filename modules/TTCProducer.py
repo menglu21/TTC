@@ -259,12 +259,17 @@ class TTCProducer(Module):
     looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
 
     # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
-    # tightLepVeto PF jets (ak4), 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
-    # DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
-    # DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
+    # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL18
+    # https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Jets
+    # tightLepVeto PF jets (ak4), UL 2016/2017/2018 (jetId 110=6), medium B-tag WP
+    # UL17 DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
+    # UL18 DeepCSV=(nanoaod btagDeepB) loose: 0.1208, medium: 0.4168, tight: 0.7665
+    # UL17 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
+    # UL18 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0490, medium: 0.2783, tight: 0.7100
 
     # c-jet tag is based on two-D cuts, medium DeepJet WP:
-    # CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
+    # UL17 CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
+    # UL18 CvsL=btagDeepFlavCvL: 0.099, CvsB=btagDeepFlavCvB: 0.325
     # c-tag not available in NANOAOD yet
 
     jets = Collection(event, 'Jet')
@@ -319,7 +324,7 @@ class TTCProducer(Module):
 
       if not (pass_jet_lep_Dr>0):continue
       if self.year=="2016":
-        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>30:
+        if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
