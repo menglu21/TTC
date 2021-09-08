@@ -312,10 +312,10 @@ class TTCProducer(Module):
     # require DeltaR between Jets and tight leptons greater than 0.4
     jet_v4_temp=TLorentzVector()
     for ijet in range(0, event.nJet):
-      pass_jet_lep_Dr=0
+      pass_jet_lep_Dr=1
       jet_v4_temp.SetPtEtaPhiM(event.Jet_pt_nom[ijet],event.Jet_eta[ijet],event.Jet_phi[ijet],event.Jet_mass_nom[ijet])
       for ilep in range(0,len(tightLeptons)):
-	if jet_v4_temp.DeltaR(tightLeptons[ilep])>0.4:pass_jet_lep_Dr=1
+	if jet_v4_temp.DeltaR(tightLeptons[ilep])<0.4:pass_jet_lep_Dr=0
 
       if not (pass_jet_lep_Dr>0):continue
       if self.year=="2016":
