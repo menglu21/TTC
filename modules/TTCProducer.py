@@ -26,6 +26,7 @@ class TTCProducer(Module):
     self.out.branch("n_loose_ele", "I")
     self.out.branch("n_tight_jet", "I")
     self.out.branch("n_bjet_DeepB", "I")
+    self.out.branch("btag_SFall", "F")
     self.out.branch("n_cjet_DeepB_medium", "I")
     self.out.branch("HT", "F")
     self.out.branch("j1_pt", "F")
@@ -369,9 +370,16 @@ class TTCProducer(Module):
       
     n_tight_jet = len(tightJets_id_in24)
     n_bjet_DeepB = len(tightJets_b_DeepCSVmedium_id)
+
+    btag_SFall=1.
+    if n_bjet_DeepB>0 and self.is_mc:
+      for ib in range(0,n_bjet_DeepB):
+        btag_SFall=btag_SFall*event.Jet_btagSF_deepjet_M[tightJets_b_DeepCSVmedium_id[ib]]
+
     n_cjet_DeepB_medium = len(tightJets_c_DeepCSVmedium_id)
     self.out.fillBranch("n_tight_jet",n_tight_jet)
     self.out.fillBranch("n_bjet_DeepB",n_bjet_DeepB)
+    self.out.fillBranch("btag_SFall",btag_SFall)
     self.out.fillBranch("n_cjet_DeepB_medium",n_cjet_DeepB_medium)
 
     if n_tight_jet>3:
