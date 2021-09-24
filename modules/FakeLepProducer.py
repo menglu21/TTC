@@ -770,7 +770,7 @@ class FakeLepProducer(Module):
 	    if tightElectrons[0].Pt()>fakeable_Electrons[0].Pt():
               ttc_lep1_faketag=False
               ttc_lep2_faketag=True
-  	      ttc_l1_id=tightElectrongs_id[0]
+  	      ttc_l1_id=tightElectrons_id[0]
       	      ttc_l2_id=fakeable_Electrons_id[0]
 	      ttc_l1_pdgid=tightElectrongs_pdgid[0]
 	      ttc_l2_pdgid=fakeable_Electrons_pdgid[0]
@@ -785,7 +785,7 @@ class FakeLepProducer(Module):
 	    else:
               ttc_lep1_faketag=True
               ttc_lep2_faketag=False
-  	      ttc_l2_id=tightElectrongs_id[0]
+  	      ttc_l2_id=tightElectrons_id[0]
       	      ttc_l1_id=fakeable_Electrons_id[0]
 	      ttc_l2_pdgid=tightElectrongs_pdgid[0]
 	      ttc_l1_pdgid=fakeable_Electrons_pdgid[0]
