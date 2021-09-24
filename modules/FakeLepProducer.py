@@ -163,7 +163,7 @@ class FakeLepProducer(Module):
     self.out.branch("fakeable_Electrons_id","I",lenVar="nElectron")
     self.out.branch("additional_vetoElectrons_id","I",lenVar="nElectron")
     self.out.branch("tightMuons_id","I",lenVar="nMuon")
-    self.out.branch("fakeable_Muons_pdgid","I",lenVar="nMuon")
+    self.out.branch("fakeable_Muons_id","I",lenVar="nMuon")
     self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
 
