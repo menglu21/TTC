@@ -1411,11 +1411,11 @@ class FakeLepProducer(Module):
 	  DY_l2_eta=fakeable_Muons[1].Eta()
 	  DY_l2_phi=fakeable_Muons[1].Phi()
 	  DY_l2_mass=fakeable_Muons[1].M()
-	  DY_z_mass=(fakeable_Leptons[0]+fakeable_Leptons[1]).M()
-	  DY_z_pt=(fakeable_Leptons[0]+fakeable_Leptons[1]).Pt()
-	  DY_z_eta=(fakeable_Leptons[0]+fakeable_Leptons[1]).Eta()
-	  DY_z_phi=(fakeable_Leptons[0]+fakeable_Leptons[1]).Phi()
-	  DY_drll=fakeable_Leptons[0].DeltaR(fakeable_Leptons[1])
+	  DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+	  DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+	  DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+	  DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+	  DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
         # 2 eles case
         if len(fakeable_Electrons)==2 and abs(fakeable_Electrons_pdgid[0]+fakeable_Electrons_pdgid[1])==0:
 	  DY_region=3
@@ -1431,11 +1431,11 @@ class FakeLepProducer(Module):
 	  DY_l2_eta=fakeable_Electrons[1].Eta()
 	  DY_l2_phi=fakeable_Electrons[1].Phi()
 	  DY_l2_mass=fakeable_Electrons[1].M()
-	  DY_z_mass=(fakeable_Leptons[0]+fakeable_Leptons[1]).M()
-	  DY_z_pt=(fakeable_Leptons[0]+fakeable_Leptons[1]).Pt()
-	  DY_z_eta=(fakeable_Leptons[0]+fakeable_Leptons[1]).Eta()
-	  DY_z_phi=(fakeable_Leptons[0]+fakeable_Leptons[1]).Phi()
-	  DY_drll=fakeable_Leptons[0].DeltaR(fakeable_Leptons[1])
+	  DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+	  DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+	  DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+	  DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+	  DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
         # 1 ele case
         if len(fakeable_Electrons)==1 and (sign(fakeable_Muons_pdgid[0])+sign(fakeable_Electrons_pdgid[0]))==0:
 	  DY_region=2
@@ -1451,11 +1451,11 @@ class FakeLepProducer(Module):
 	  DY_l2_eta=fakeable_Electrons[0].Eta()
 	  DY_l2_phi=fakeable_Electrons[0].Phi()
 	  DY_l2_mass=fakeable_Electrons[0].M()
-	  DY_z_mass=(fakeable_Leptons[0]+fakeable_Leptons[1]).M()
-	  DY_z_pt=(fakeable_Leptons[0]+fakeable_Leptons[1]).Pt()
-	  DY_z_eta=(fakeable_Leptons[0]+fakeable_Leptons[1]).Eta()
-	  DY_z_phi=(fakeable_Leptons[0]+fakeable_Leptons[1]).Phi()
-	  DY_drll=fakeable_Leptons[0].DeltaR(fakeable_Leptons[1])
+	  DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+	  DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+	  DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+	  DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+	  DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
 
       if len(fakeableLeptons)==1:
         DY_1P1F=True
