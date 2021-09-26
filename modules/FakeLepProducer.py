@@ -64,8 +64,6 @@ class FakeLepProducer(Module):
     self.out.branch("DeepC_medium_j2_phi", "F")
     self.out.branch("DeepC_medium_j2_mass", "F")
     self.out.branch("ttc_nl", "B")
-    self.out.branch("ttc_nl", "B")
-    self.out.branch("ttc_nl", "B")
     self.out.branch("ttc_jets", "B")
     self.out.branch("ttc_1P1F", "B")
     self.out.branch("ttc_0P2F", "B")
@@ -276,7 +274,7 @@ class FakeLepProducer(Module):
         additional_vetoElectrons.append(electron_v4_temp.Clone())
         additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
         additional_vetoElectrons_id.append(iele)
-      if (electrons[iele].cutBased==0):
+      if (electrons[iele].cutBased==1):
 	if self.is_mc and (electrons[iele].genPartFlav==1 or electrons[iele].genPartFlav==15):
           electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           fakeable_Electrons.append(electron_v4_temp.Clone())
