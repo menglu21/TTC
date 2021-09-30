@@ -9,7 +9,7 @@ import math
 import os
 import numpy as np
 from numpy import sign
-from numpy import sqrt
+from numpy import sqrt, cos
 
 class FakeRateProducer(Module):
   def __init__(self , year):
