@@ -1,0 +1,27 @@
+# this is a comment
+keep *
+drop nFatJet*
+drop FatJet_area*
+drop nSubJet*
+drop SubJet*
+drop nTrigObj*
+drop TrigObj*
+drop L1*
+drop GenPart_*
+drop HLT_AK*
+drop HLT_DoubleMu4*
+drop HLT_Mu7p5*
+drop HLT_IsoMu20*
+drop HLT_IsoMu24*
+drop HLT_L2Mu*
+drop HLT_DiPFJet*
+drop HLT_PFJet*
+drop HLT_Calo*
+drop HLT_DoublePF*
+drop HLT_BTag*
+drop HLT_Photon*
+drop HLT_Diphoton*
+drop HLT_Dimuon*
+drop HLT_DoubleMu*
+drop HLT_ZeroBias*
+

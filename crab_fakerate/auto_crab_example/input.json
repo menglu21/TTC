@@ -1,0 +1,6 @@
+[
+    {"name":"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL17NanoAODv2-106X_mc2017_realistic_v8-v1/NANOAODSIM", "type":"MC", "year":"2017", "era":"B"},
+    {"name":"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer19UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM", "type":"MC", "year":"2018", "era":"B"},
+    {"name":"/MuonEG/Run2018C-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018", "era":"C"},
+    {"name":"/MuonEG/Run2017D-UL2017_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2017", "era":"D"}
+]
