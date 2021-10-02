@@ -176,8 +176,8 @@ class TTCProducer(Module):
 
     lhe_nlepton=0
     if self.is_lhe:
-      lheparticle = Collection(event, 'lhePart')
-      for ilhe in range(0, event.nlhePart):
+      lheparticle = Collection(event, 'LHEPart')
+      for ilhe in range(0, event.nLHEPart):
         if lheparticle[ilhe].status==1 and (abs(lheparticle[ilhe].pdgId)==11 or abs(lheparticle[ilhe].pdgId)==13 or abs(lheparticle[ilhe].pdgId)==15):
           lhe_nlepton=lhe_nlepton+1
 
