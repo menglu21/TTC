@@ -238,13 +238,12 @@ class FakeLepProducer(Module):
     self.out.fillBranch("n_tight_muon", n_tight_muon)
     self.out.fillBranch("n_fakeable_muon", n_fakeable_muon)
     self.out.fillBranch("n_loose_muon", n_loose_muon)
-    if event.nMuon>0:
-      tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
-      fakeable_Muons_id.extend(np.zeros(event.nMuon-len(fakeable_Muons_id),int)-1)
-      additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
-      self.out.fillBranch("tightMuons_id", tightMuons_id)
-      self.out.fillBranch("fakeable_Muons_id", fakeable_Muons_id)
-      self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
+    tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
+    fakeable_Muons_id.extend(np.zeros(event.nMuon-len(fakeable_Muons_id),int)-1)
+    additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
+    self.out.fillBranch("tightMuons_id", tightMuons_id)
+    self.out.fillBranch("fakeable_Muons_id", fakeable_Muons_id)
+    self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
 
     # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 15 GeV
     electrons = Collection(event, 'Electron')
@@ -292,13 +291,12 @@ class FakeLepProducer(Module):
     self.out.fillBranch("n_tight_ele", n_tight_ele)
     self.out.fillBranch("n_fakeable_ele", n_fakeable_ele)
     self.out.fillBranch("n_loose_ele", n_loose_ele)
-    if event.nElectron>0:
-      tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
-      fakeable_Electrons_id.extend(np.zeros(event.nElectron-len(fakeable_Electrons_id),int)-1)
-      additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
-      self.out.fillBranch("tightElectrons_id", tightElectrons_id)
-      self.out.fillBranch("fakeable_Electrons_id", fakeable_Electrons_id)
-      self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
+    tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
+    fakeable_Electrons_id.extend(np.zeros(event.nElectron-len(fakeable_Electrons_id),int)-1)
+    additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
+    self.out.fillBranch("tightElectrons_id", tightElectrons_id)
+    self.out.fillBranch("fakeable_Electrons_id", fakeable_Electrons_id)
+    self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
 
     # tight leptons and additional loose leptons collection
     tightLeptons = tightMuons + tightElectrons
@@ -770,12 +768,12 @@ class FakeLepProducer(Module):
               ttc_lep2_faketag=True
   	      ttc_l1_id=tightElectrons_id[0]
       	      ttc_l2_id=fakeable_Electrons_id[0]
-	      ttc_l1_pdgid=tightElectrongs_pdgid[0]
+	      ttc_l1_pdgid=tightElectrons_pdgid[0]
 	      ttc_l2_pdgid=fakeable_Electrons_pdgid[0]
-	      ttc_l1_pt=tightElectrongs[0].Pt()
-	      ttc_l1_eta=tightElectrongs[0].Eta()
-	      ttc_l1_phi=tightElectrongs[0].Phi()
-	      ttc_l1_mass=tightElectrongs[0].M()
+	      ttc_l1_pt=tightElectrons[0].Pt()
+	      ttc_l1_eta=tightElectrons[0].Eta()
+	      ttc_l1_phi=tightElectrons[0].Phi()
+	      ttc_l1_mass=tightElectrons[0].M()
 	      ttc_l2_pt=fakeable_Electrons[0].Pt()
 	      ttc_l2_eta=fakeable_Electrons[0].Eta()
 	      ttc_l2_phi=fakeable_Electrons[0].Phi()
@@ -785,19 +783,19 @@ class FakeLepProducer(Module):
               ttc_lep2_faketag=False
   	      ttc_l2_id=tightElectrons_id[0]
       	      ttc_l1_id=fakeable_Electrons_id[0]
-	      ttc_l2_pdgid=tightElectrongs_pdgid[0]
+	      ttc_l2_pdgid=tightElectrons_pdgid[0]
 	      ttc_l1_pdgid=fakeable_Electrons_pdgid[0]
-	      ttc_l2_pt=tightElectrongs[0].Pt()
-	      ttc_l2_eta=tightElectrongs[0].Eta()
-	      ttc_l2_phi=tightElectrongs[0].Phi()
-	      ttc_l2_mass=tightElectrongs[0].M()
+	      ttc_l2_pt=tightElectrons[0].Pt()
+	      ttc_l2_eta=tightElectrons[0].Eta()
+	      ttc_l2_phi=tightElectrons[0].Phi()
+	      ttc_l2_mass=tightElectrons[0].M()
 	      ttc_l1_pt=fakeable_Electrons[0].Pt()
 	      ttc_l1_eta=fakeable_Electrons[0].Eta()
 	      ttc_l1_phi=fakeable_Electrons[0].Phi()
 	      ttc_l1_mass=fakeable_Electrons[0].M()
-      	    ttc_mll=(fakeable_Electrons[0]+tightElectrongs[0]).M()
-      	    ttc_drll=fakeable_Electrons[0].DeltaR(tightElectrongs[0])
-      	    ttc_dphill=fakeable_Electrons[0].DeltaPhi(tightElectrongs[0])
+      	    ttc_mll=(fakeable_Electrons[0]+tightElectrons[0]).M()
+      	    ttc_drll=fakeable_Electrons[0].DeltaR(tightElectrons[0])
+      	    ttc_dphill=fakeable_Electrons[0].DeltaPhi(tightElectrons[0])
 
     if ttc_region>0:
       l1_v4_temp=TLorentzVector()
