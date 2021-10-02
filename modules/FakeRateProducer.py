@@ -84,10 +84,16 @@ class FakeRateProducer(Module):
     for imu in range(0, event.nMuon):
       if (muons[imu].tightId):
         if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>20):
-          muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
-          tightMuons.append(muon_v4_temp.Clone())
-          tightMuons_pdgid.append(muons[imu].pdgId)
-          tightMuons_id.append(imu)
+	  if not self.is_mc:
+            muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+            tightMuons.append(muon_v4_temp.Clone())
+            tightMuons_pdgid.append(muons[imu].pdgId)
+            tightMuons_id.append(imu)
+	  if self.is_mc and (muons[imu].genPartFlav==1 or muons[imu].genPartFlav==15):
+	    muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+            tightMuons.append(muon_v4_temp.Clone())
+            tightMuons_pdgid.append(muons[imu].pdgId)
+            tightMuons_id.append(imu)
 	if (muons[imu].pfRelIso04_all<0.4 and muons[imu].pfRelIso04_all>0.2 and abs(muons[imu].eta)<2.4 and event.Muon_corrected_pt[imu]>20):
 	  if self.is_mc and (muons[imu].genPartFlav==1 or muons[imu].genPartFlav==15):
             muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
@@ -136,10 +142,16 @@ class FakeRateProducer(Module):
     for iele in range(0, event.nElectron):
       if not ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)): continue
       if (electrons[iele].cutBased==4 and electrons[iele].tightCharge==2 and electrons[iele].pt>20):
-        electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
-        tightElectrons.append(electron_v4_temp.Clone())
-        tightElectrons_pdgid.append(electrons[iele].pdgId)
-        tightElectrons_id.append(iele)
+	if not self.is_mc:
+          electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          tightElectrons.append(electron_v4_temp.Clone())
+          tightElectrons_pdgid.append(electrons[iele].pdgId)
+          tightElectrons_id.append(iele)
+	if self.is_mc and (electrons[iele].genPartFlav==1 or electrons[iele].genPartFlav==15):
+	  electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+          tightElectrons.append(electron_v4_temp.Clone())
+          tightElectrons_pdgid.append(electrons[iele].pdgId)
+          tightElectrons_id.append(iele)
       if (electrons[iele].cutBased>1 and electrons[iele].cutBased<4 and electrons[iele].pt>15):
         electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
         additional_vetoElectrons.append(electron_v4_temp.Clone())

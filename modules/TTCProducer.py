@@ -20,13 +20,13 @@ class TTCProducer(Module):
   def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
     self.out = wrappedOutputTree
     self.out.branch("HLT_passEle32WPTight", "I")
+    self.out.branch("lhe_nlepton", "I")
     self.out.branch("n_tight_muon", "I")
     self.out.branch("n_loose_muon", "I")
     self.out.branch("n_tight_ele", "I")
     self.out.branch("n_loose_ele", "I")
     self.out.branch("n_tight_jet", "I")
     self.out.branch("n_bjet_DeepB", "I")
-    self.out.branch("btag_SFall", "F")
     self.out.branch("n_cjet_DeepB_medium", "I")
     self.out.branch("HT", "F")
     self.out.branch("j1_pt", "F")
@@ -152,6 +152,7 @@ class TTCProducer(Module):
     self.out.branch("tightMuons_id","I",lenVar="nMuon")
     self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
+    self.is_lhe = bool(inputTree.GetBranch("nLHEPart"))
 
   def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
     pass
@@ -172,6 +173,15 @@ class TTCProducer(Module):
 	    HLT_passEle32WPTight=1
 
     self.out.fillBranch("HLT_passEle32WPTight",HLT_passEle32WPTight)
+
+    lhe_nlepton=0
+    if self.is_lhe:
+      lheparticle = Collection(event, 'lhePart')
+      for ilhe in range(0, event.nlhePart):
+        if lheparticle[ilhe].status==1 and (abs(lheparticle[ilhe].pdgId)==11 or abs(lheparticle[ilhe].pdgId)==13 or abs(lheparticle[ilhe].pdgId)==15):
+          lhe_nlepton=lhe_nlepton+1
+
+    self.out.fillBranch("lhe_nlepton", lhe_nlepton)
 
     # total number of ele+muon, currently require at least 1 leptons
     if ((event.nMuon + event.nElectron) < 2): return False
@@ -208,11 +218,10 @@ class TTCProducer(Module):
 
     self.out.fillBranch("n_tight_muon", n_tight_muon)
     self.out.fillBranch("n_loose_muon", n_loose_muon)
-    if event.nMuon>0:
-      tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
-      additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
-      self.out.fillBranch("tightMuons_id", tightMuons_id)
-      self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
+    tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
+    additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
+    self.out.fillBranch("tightMuons_id", tightMuons_id)
+    self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
 
     # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 15 GeV
     electrons = Collection(event, 'Electron')
@@ -245,11 +254,10 @@ class TTCProducer(Module):
     n_loose_ele = len(additional_vetoElectrons)
     self.out.fillBranch("n_tight_ele", n_tight_ele)
     self.out.fillBranch("n_loose_ele", n_loose_ele)
-    if event.nElectron>0:
-      tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
-      additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
-      self.out.fillBranch("tightElectrons_id", tightElectrons_id)
-      self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
+    tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
+    additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
+    self.out.fillBranch("tightElectrons_id", tightElectrons_id)
+    self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
 
     # tight leptons and additional loose leptons collection
     tightLeptons = tightMuons + tightElectrons
@@ -260,17 +268,12 @@ class TTCProducer(Module):
     looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
 
     # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
-    # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL18
-    # https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Jets
-    # tightLepVeto PF jets (ak4), UL 2016/2017/2018 (jetId 110=6), medium B-tag WP
-    # UL17 DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
-    # UL18 DeepCSV=(nanoaod btagDeepB) loose: 0.1208, medium: 0.4168, tight: 0.7665
-    # UL17 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
-    # UL18 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0490, medium: 0.2783, tight: 0.7100
+    # tightLepVeto PF jets (ak4), 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
+    # DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
+    # DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
 
     # c-jet tag is based on two-D cuts, medium DeepJet WP:
-    # UL17 CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
-    # UL18 CvsL=btagDeepFlavCvL: 0.099, CvsB=btagDeepFlavCvB: 0.325
+    # CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
     # c-tag not available in NANOAOD yet
 
     jets = Collection(event, 'Jet')
@@ -325,7 +328,7 @@ class TTCProducer(Module):
 
       if not (pass_jet_lep_Dr>0):continue
       if self.year=="2016":
-        if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
+        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>30:
 	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
 	    tightJets_id_in47.append(ijet)
 	  if abs(jets[ijet].eta)<2.4:
@@ -370,16 +373,9 @@ class TTCProducer(Module):
       
     n_tight_jet = len(tightJets_id_in24)
     n_bjet_DeepB = len(tightJets_b_DeepCSVmedium_id)
-
-    btag_SFall=1.
-    if n_bjet_DeepB>0 and self.is_mc:
-      for ib in range(0,n_bjet_DeepB):
-        btag_SFall=btag_SFall*event.Jet_btagSF_deepjet_M[tightJets_b_DeepCSVmedium_id[ib]]
-
     n_cjet_DeepB_medium = len(tightJets_c_DeepCSVmedium_id)
     self.out.fillBranch("n_tight_jet",n_tight_jet)
     self.out.fillBranch("n_bjet_DeepB",n_bjet_DeepB)
-    self.out.fillBranch("btag_SFall",btag_SFall)
     self.out.fillBranch("n_cjet_DeepB_medium",n_cjet_DeepB_medium)
 
     if n_tight_jet>3:
