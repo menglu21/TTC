@@ -20,6 +20,7 @@ class FakeLepProducer(Module):
   def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
     self.out = wrappedOutputTree
     self.out.branch("HLT_passEle32WPTight", "I")
+    self.out.branch("lhe_nlepton", "I")
     self.out.branch("n_tight_muon", "I")
     self.out.branch("n_fakeable_muon", "I")
     self.out.branch("n_loose_muon", "I")
@@ -164,6 +165,7 @@ class FakeLepProducer(Module):
     self.out.branch("fakeable_Muons_id","I",lenVar="nMuon")
     self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
+    self.is_lhe = bool(inputTree.GetBranch("nLHEPart"))
 
   def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
     pass
@@ -184,6 +186,15 @@ class FakeLepProducer(Module):
 	    HLT_passEle32WPTight=1
 
     self.out.fillBranch("HLT_passEle32WPTight",HLT_passEle32WPTight)
+
+    lhe_nlepton=0
+    if self.is_lhe:
+      lheparticle = Collection(event, 'LHEPart')
+      for ilhe in range(0, event.nLHEPart):
+        if lheparticle[ilhe].status==1 and (abs(lheparticle[ilhe].pdgId)==11 or abs(lheparticle[ilhe].pdgId)==13 or abs(lheparticle[ilhe].pdgId)==15):
+          lhe_nlepton=lhe_nlepton+1
+
+    self.out.fillBranch("lhe_nlepton", lhe_nlepton)
 
     # total number of ele+muon, currently require at least 1 leptons
     if ((event.nMuon + event.nElectron) < 2): return False
