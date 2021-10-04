@@ -145,12 +145,12 @@ class FakeRateProducer(Module):
         additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
         additional_vetoElectrons_id.append(iele)
       if (electrons[iele].cutBased==1):
-	if self.is_mc and (electrons[iele].genPartFlav==1 or electrons[iele].genPartFlav==15 and electrons[iele].pt>20):
+	if self.is_mc and (electrons[iele].genPartFlav==1 or electrons[iele].genPartFlav==15) and electrons[iele].pt>20:
           electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           fakeable_Electrons.append(electron_v4_temp.Clone())
           fakeable_Electrons_pdgid.append(electrons[iele].pdgId)
           fakeable_Electrons_id.append(iele)
-	if not self.is_mc:
+	if (not self.is_mc) and electrons[iele].pt>20:
 	  electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           fakeable_Electrons.append(electron_v4_temp.Clone())
           fakeable_Electrons_pdgid.append(electrons[iele].pdgId)
