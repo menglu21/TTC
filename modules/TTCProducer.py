@@ -22,13 +22,16 @@ class TTCProducer(Module):
     self.out.branch("HLT_passEle32WPTight", "I")
     self.out.branch("lhe_nlepton", "I")
     self.out.branch("n_tight_muon", "I")
+    self.out.branch("n_fakeable_muon", "I")
     self.out.branch("n_loose_muon", "I")
     self.out.branch("n_tight_ele", "I")
+    self.out.branch("n_fakeable_ele", "I")
     self.out.branch("n_loose_ele", "I")
     self.out.branch("n_tight_jet", "I")
     self.out.branch("n_bjet_DeepB", "I")
     self.out.branch("n_cjet_DeepB_medium", "I")
     self.out.branch("HT", "F")
+    self.out.branch("nHad_tau", "I")
     self.out.branch("j1_pt", "F")
     self.out.branch("j1_eta", "F")
     self.out.branch("j1_phi", "F")
@@ -45,6 +48,22 @@ class TTCProducer(Module):
     self.out.branch("j4_eta", "F")
     self.out.branch("j4_phi", "F")
     self.out.branch("j4_mass", "F")
+    self.out.branch("mj1j2", "F")
+    self.out.branch("mj1j3", "F")
+    self.out.branch("mj1j4", "F")
+    self.out.branch("mj2j3", "F")
+    self.out.branch("mj2j4", "F")
+    self.out.branch("mj3j4", "F")
+    self.out.branch("mj1j2j3", "F")
+    self.out.branch("mj1j2j4", "F")
+    self.out.branch("mj2j3j4", "F")
+    self.out.branch("mj1j2j3j4", "F")
+    self.out.branch("drj1j2", "F")
+    self.out.branch("drj1j3", "F")
+    self.out.branch("drj1j4", "F")
+    self.out.branch("drj2j3", "F")
+    self.out.branch("drj2j4", "F")
+    self.out.branch("drj3j4", "F")
     self.out.branch("DeepB_j1_pt", "F")
     self.out.branch("DeepB_j1_eta", "F")
     self.out.branch("DeepB_j1_phi", "F")
@@ -62,9 +81,12 @@ class TTCProducer(Module):
     self.out.branch("DeepC_medium_j2_phi", "F")
     self.out.branch("DeepC_medium_j2_mass", "F")
     self.out.branch("ttc_nl", "B")
-    self.out.branch("ttc_nl", "B")
-    self.out.branch("ttc_nl", "B")
     self.out.branch("ttc_jets", "B")
+    self.out.branch("ttc_2P0F", "B")
+    self.out.branch("ttc_1P1F", "B")
+    self.out.branch("ttc_0P2F", "B")
+    self.out.branch("ttc_lep1_faketag", "B")
+    self.out.branch("ttc_lep2_faketag", "B")
     self.out.branch("ttc_region", "I")
     self.out.branch("ttc_l1_id", "I")
     self.out.branch("ttc_l2_id", "I")
@@ -120,6 +142,11 @@ class TTCProducer(Module):
     self.out.branch("WZ_Z_phi", "F")
     self.out.branch("WZ_met", "F")
     self.out.branch("DY_region", "I")
+    self.out.branch("DY_2P0F", "B")
+    self.out.branch("DY_1P1F", "B")
+    self.out.branch("DY_0P2F", "B")
+    self.out.branch("DY_lep1_faketag", "B")
+    self.out.branch("DY_lep2_faketag", "B")
     self.out.branch("DY_l1_id", "I")
     self.out.branch("DY_l2_id", "I")
     self.out.branch("DY_l1_pdgid", "I")
@@ -148,9 +175,12 @@ class TTCProducer(Module):
     self.out.branch("tightJets_b_DeepCSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightJets_c_DeepCSVmedium_id","I",lenVar="nJet")
     self.out.branch("tightElectrons_id","I",lenVar="nElectron")
+    self.out.branch("fakeable_Electrons_id","I",lenVar="nElectron")
     self.out.branch("additional_vetoElectrons_id","I",lenVar="nElectron")
     self.out.branch("tightMuons_id","I",lenVar="nMuon")
+    self.out.branch("fakeable_Muons_id","I",lenVar="nMuon")
     self.out.branch("additional_looseMuons_id","I",lenVar="nMuon")
+    self.out.branch("Had_tau_id","I",lenVar="nTau")
     self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
     self.is_lhe = bool(inputTree.GetBranch("nLHEPart"))
 
@@ -194,18 +224,42 @@ class TTCProducer(Module):
     tightMuons_raw = []
     tightMuons_pdgid = []
     tightMuons_id = []
+    fakeable_Muons = []
+    fakeable_Muons_pdgid = []
+    fakeable_Muons_id = []
     additional_looseMuons = []
     additional_looseMuons_pdgid = []
     additional_looseMuons_id = []
     for imu in range(0, event.nMuon):
       if (muons[imu].tightId):
-        if (muons[imu].pfRelIso04_all<0.15 and abs(muons[imu].eta)<2.4 and muons[imu].tightCharge==2 and event.Muon_corrected_pt[imu]>15):
-          muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
-          muon_v4_temp_raw.SetPtEtaPhiM(muons[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
-          tightMuons.append(muon_v4_temp.Clone())
-          tightMuons_raw.append(muon_v4_temp_raw.Clone())
-          tightMuons_pdgid.append(muons[imu].pdgId)
-          tightMuons_id.append(imu)
+	if (muons[imu].pfRelIso04_all<0.4 and abs(muons[imu].eta)<2.4):
+	  if (event.Muon_corrected_pt[imu]>20):
+	    if (muons[imu].pfRelIso04_all<0.15 and muons[imu].tightCharge==2):
+	      muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+              muon_v4_temp_raw.SetPtEtaPhiM(muons[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
+              tightMuons.append(muon_v4_temp.Clone())
+              tightMuons_raw.append(muon_v4_temp_raw.Clone())
+              tightMuons_pdgid.append(muons[imu].pdgId)
+              tightMuons_id.append(imu)
+	    else:
+	      if self.is_mc and (muons[imu].genPartFlav==1 or muons[imu].genPartFlav==15):
+                muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+                muon_v4_temp_raw.SetPtEtaPhiM(muons[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
+                fakeable_Muons.append(muon_v4_temp.Clone())
+                fakeable_Muons_pdgid.append(muons[imu].pdgId)
+                fakeable_Muons_id.append(imu)
+	      if not self.is_mc:
+                muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+                muon_v4_temp_raw.SetPtEtaPhiM(muons[imu].pt, muons[imu].eta, muons[imu].phi, muons[imu].mass)
+                fakeable_Muons.append(muon_v4_temp.Clone())
+                fakeable_Muons_pdgid.append(muons[imu].pdgId)
+                fakeable_Muons_id.append(imu)
+	  if (event.Muon_corrected_pt[imu]>15 and event.Muon_corrected_pt[imu]<20):
+	    muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
+            additional_looseMuons.append(muon_v4_temp.Clone())
+            additional_looseMuons_pdgid.append(muons[imu].pdgId)
+            additional_looseMuons_id.append(imu)
+
       elif (muons[imu].looseId):
         if (muons[imu].pfRelIso04_all<0.25 and abs(muons[imu].eta)<2.4 and event.Muon_corrected_pt[imu]>15):
           muon_v4_temp.SetPtEtaPhiM(event.Muon_corrected_pt[imu], muons[imu].eta, muons[imu].phi, muons[imu].mass)
@@ -214,13 +268,17 @@ class TTCProducer(Module):
           additional_looseMuons_id.append(imu)
 
     n_tight_muon = len(tightMuons)
+    n_fakeable_muon = len(fakeable_Muons)
     n_loose_muon = len(additional_looseMuons)
 
     self.out.fillBranch("n_tight_muon", n_tight_muon)
+    self.out.fillBranch("n_fakeable_muon", n_fakeable_muon)
     self.out.fillBranch("n_loose_muon", n_loose_muon)
     tightMuons_id.extend(np.zeros(event.nMuon-len(tightMuons_id),int)-1)
+    fakeable_Muons_id.extend(np.zeros(event.nMuon-len(fakeable_Muons_id),int)-1)
     additional_looseMuons_id.extend(np.zeros(event.nMuon-len(additional_looseMuons_id),int)-1)
     self.out.fillBranch("tightMuons_id", tightMuons_id)
+    self.out.fillBranch("fakeable_Muons_id", fakeable_Muons_id)
     self.out.fillBranch("additional_looseMuons_id", additional_looseMuons_id)
 
     # electron selection: tight (veto) cut-based ID + impact parameter cut, with pt > 15 GeV
@@ -231,32 +289,56 @@ class TTCProducer(Module):
     tightElectrons_raw = []
     tightElectrons_pdgid = []
     tightElectrons_id = []
+    fakeable_Electrons = []
+    fakeable_Electrons_pdgid = []
+    fakeable_Electrons_id = []
     additional_vetoElectrons = []
     additional_vetoElectrons_pdgid = []
     additional_vetoElectrons_id = []
     for iele in range(0, event.nElectron):
-      if (electrons[iele].cutBased==4):
-        if (electrons[iele].tightCharge==2 and ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
-          electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
-          electron_v4_temp_raw.SetPtEtaPhiM(electrons[iele].pt/electrons[iele].eCorr, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass/electrons[iele].eCorr)
-          tightElectrons.append(electron_v4_temp.Clone())
-          tightElectrons_raw.append(electron_v4_temp_raw.Clone())
-          tightElectrons_pdgid.append(electrons[iele].pdgId)
-          tightElectrons_id.append(iele)
-      elif (electrons[iele].cutBased>0):
-        if (((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)) and electrons[iele].pt>15):
-          electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+      if not ((abs(electrons[iele].eta+electrons[iele].deltaEtaSC) <1.4442 and abs(electrons[iele].dxy)<0.05 and abs(electrons[iele].dz)<0.1) or (abs(electrons[iele].eta + electrons[iele].deltaEtaSC)>1.566 and abs(electrons[iele].eta + electrons[iele].deltaEtaSC)<2.4 and abs(electrons[iele].dxy)<0.1 and abs(electrons[iele].dz)<0.2)): continue
+      if (electrons[iele].cutBased>1):
+	if (electrons[iele].pt>20):
+	  if (electrons[iele].cutBased==4 and electrons[iele].tightCharge==2):
+	    electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+            electron_v4_temp_raw.SetPtEtaPhiM(electrons[iele].pt/electrons[iele].eCorr, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass/electrons[iele].eCorr)
+            tightElectrons.append(electron_v4_temp.Clone())
+            tightElectrons_raw.append(electron_v4_temp_raw.Clone())
+            tightElectrons_pdgid.append(electrons[iele].pdgId)
+            tightElectrons_id.append(iele)
+	  else:
+	    if self.is_mc and (electrons[iele].genPartFlav==1 or electrons[iele].genPartFlav==15):
+              electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+              fakeable_Electrons.append(electron_v4_temp.Clone())
+              fakeable_Electrons_pdgid.append(electrons[iele].pdgId)
+              fakeable_Electrons_id.append(iele)
+            if (not self.is_mc):
+              electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+              fakeable_Electrons.append(electron_v4_temp.Clone())
+              fakeable_Electrons_pdgid.append(electrons[iele].pdgId)
+              fakeable_Electrons_id.append(iele)
+	if (electrons[iele].pt>15 and electrons[iele].pt<20):
+	  electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
           additional_vetoElectrons.append(electron_v4_temp.Clone())
           additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
           additional_vetoElectrons_id.append(iele)
+      if (electrons[iele].cutBased==1 and electrons[iele].pt>15):
+        electron_v4_temp.SetPtEtaPhiM(electrons[iele].pt, electrons[iele].eta, electrons[iele].phi, electrons[iele].mass)
+        additional_vetoElectrons.append(electron_v4_temp.Clone())
+        additional_vetoElectrons_pdgid.append(electrons[iele].pdgId)
+        additional_vetoElectrons_id.append(iele)
 
     n_tight_ele = len(tightElectrons)
+    n_fakeable_ele = len(fakeable_Electrons)
     n_loose_ele = len(additional_vetoElectrons)
     self.out.fillBranch("n_tight_ele", n_tight_ele)
+    self.out.fillBranch("n_fakeable_ele", n_fakeable_ele)
     self.out.fillBranch("n_loose_ele", n_loose_ele)
     tightElectrons_id.extend(np.zeros(event.nElectron-len(tightElectrons_id),int)-1)
+    fakeable_Electrons_id.extend(np.zeros(event.nElectron-len(fakeable_Electrons_id),int)-1)
     additional_vetoElectrons_id.extend(np.zeros(event.nElectron-len(additional_vetoElectrons_id),int)-1)
     self.out.fillBranch("tightElectrons_id", tightElectrons_id)
+    self.out.fillBranch("fakeable_Electrons_id", fakeable_Electrons_id)
     self.out.fillBranch("additional_vetoElectrons_id", additional_vetoElectrons_id)
 
     # tight leptons and additional loose leptons collection
@@ -264,8 +346,27 @@ class TTCProducer(Module):
     tightLeptons.sort(key=lambda x: x.Pt(), reverse=True)
     tightLeptons_raw = tightMuons_raw + tightElectrons_raw
     tightLeptons_raw.sort(key=lambda x: x.Pt(), reverse=True)
+    fakeableLeptons = fakeable_Muons + fakeable_Electrons
+    fakeableLeptons.sort(key=lambda x: x.Pt(), reverse=True)
     looseLeptons = additional_looseMuons + additional_vetoElectrons
     looseLeptons.sort(key=lambda x: x.Pt(), reverse=True)
+
+    tau_v4_temp=TLorentzVector()
+    taus = Collection(event, 'Tau')
+    nHad_tau=0
+    Had_tau_id=[]
+    for itau in range(0, event.nTau):
+      tau_v4_temp.SetPtEtaPhiM(taus[itau].pt, taus[itau].eta, taus[itau].phi, taus[itau].mass)
+      pass_tau_lep_Dr=1
+      if taus[itau].pt>20 and abs(taus[itau].eta)<2.3 and taus[itau].idDecayModeNewDMs and taus[itau].idDeepTau2017v2p1VSe>=4 and taus[itau].idDeepTau2017v2p1VSjet>=4 and taus[itau].idDeepTau2017v2p1VSmu>=1:
+	for ilep in range(0,len(tightLeptons)):
+          if tau_v4_temp.DeltaR(tightLeptons[ilep])<0.4:pass_tau_lep_Dr=0
+	for ilep in range(0,len(fakeableLeptons)):
+          if tau_v4_temp.DeltaR(fakeableLeptons[ilep])<0.4:pass_tau_lep_Dr=0
+	if pass_tau_lep_Dr:
+	  nHad_tau=nHad_tau+1
+	  Had_tau_id.append(itau)
+    self.out.fillBranch("nHad_tau", nHad_tau)
 
     # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
     # tightLepVeto PF jets (ak4), 2016 (111=7), 2017/2018 (110=6), medium B-tag WP
@@ -294,6 +395,22 @@ class TTCProducer(Module):
     j4_eta=-99
     j4_phi=-99
     j4_mass=-99
+    mj1j2=-99
+    mj1j3=-99
+    mj1j4=-99
+    mj2j3=-99
+    mj2j4=-99
+    mj3j4=-99
+    mj1j2j3=-99
+    mj1j2j4=-99
+    mj2j3j4=-99
+    mj1j2j3j4=-99
+    drj1j2=-99
+    drj1j3=-99
+    drj1j4=-99
+    drj2j3=-99
+    drj2j4=-99
+    drj3j4=-99
     DeepB_j1_pt=-99
     DeepB_j1_eta=-99
     DeepB_j1_phi=-99
@@ -320,42 +437,39 @@ class TTCProducer(Module):
 
     # require DeltaR between Jets and tight leptons greater than 0.4
     jet_v4_temp=TLorentzVector()
+    jet_v4_all = []
     for ijet in range(0, event.nJet):
+
+      jet_is_tau=0
+      if nHad_tau>0:
+        for ita in Had_tau_id:
+          if ijet==event.Tau_jetIdx[ita]:jet_is_tau=1
+      if jet_is_tau:continue
+
       pass_jet_lep_Dr=1
       jet_v4_temp.SetPtEtaPhiM(event.Jet_pt_nom[ijet],event.Jet_eta[ijet],event.Jet_phi[ijet],event.Jet_mass_nom[ijet])
       for ilep in range(0,len(tightLeptons)):
 	if jet_v4_temp.DeltaR(tightLeptons[ilep])<0.4:pass_jet_lep_Dr=0
+      for ilep in range(0,len(fakeableLeptons)):
+	if jet_v4_temp.DeltaR(fakeableLeptons[ilep])<0.4:pass_jet_lep_Dr=0
 
       if not (pass_jet_lep_Dr>0):continue
-      if self.year=="2016":
-        if jets[ijet].jetId==7 and event.Jet_pt_nom[ijet]>30:
-	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
-	    tightJets_id_in47.append(ijet)
-	  if abs(jets[ijet].eta)<2.4:
-	    tightJets_id_in24.append(ijet)
+      if not (jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30):continue
 
-            if (jets[ijet].btagDeepB > 0.4941):
-              tightJets_b_DeepCSVmedium_id.append(ijet)
+      if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4: 
+        tightJets_id_in47.append(ijet)
+      if abs(jets[ijet].eta)<2.4:
+        tightJets_id_in24.append(ijet)
+        jet_v4_all.append(jet_v4_temp.Clone())
 
-      if (self.year=="2017"):
-	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
-	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
-	    tightJets_id_in47.append(ijet)
-	  if abs(jets[ijet].eta)<2.4:
-            tightJets_id_in24.append(ijet)
+      if self.year=="2016" and jets[ijet].btagDeepB > 0.4941:
+        tightJets_b_DeepCSVmedium_id.append(ijet)
 
-            if (jets[ijet].btagDeepFlavB > 0.3040):
-              tightJets_b_DeepCSVmedium_id.append(ijet)
+      if self.year=="2017" and jets[ijet].btagDeepFlavB > 0.3040:
+        tightJets_b_DeepCSVmedium_id.append(ijet)
 
-      if (self.year=="2018"):
-	if jets[ijet].jetId==6 and event.Jet_pt_nom[ijet]>30:
-	  if abs(jets[ijet].eta)<4.7 and abs(jets[ijet].eta)>=2.4:
-	    tightJets_id_in47.append(ijet)
-	  if abs(jets[ijet].eta)<2.4:
-            tightJets_id_in24.append(ijet)
-
-            if (jets[ijet].btagDeepFlavB > 0.2783):
-              tightJets_b_DeepCSVmedium_id.append(ijet)
+      if self.year=="2018" and jets[ijet].btagDeepFlavB > 0.2783:
+        tightJets_b_DeepCSVmedium_id.append(ijet)
 
     HT=0
     for ijet in range(0,len(tightJets_id_in24)):
@@ -378,6 +492,10 @@ class TTCProducer(Module):
     self.out.fillBranch("n_bjet_DeepB",n_bjet_DeepB)
     self.out.fillBranch("n_cjet_DeepB_medium",n_cjet_DeepB_medium)
 
+    Had_tau_id.extend(np.zeros(event.nTau-len(Had_tau_id),int)-1)
+    self.out.fillBranch("Had_tau_id", Had_tau_id)
+    
+
     if n_tight_jet>3:
       j4_pt=event.Jet_pt_nom[tightJets_id_in24[3]]
       j4_eta=event.Jet_eta[tightJets_id_in24[3]]
@@ -395,6 +513,22 @@ class TTCProducer(Module):
       j1_eta=event.Jet_eta[tightJets_id_in24[0]]
       j1_phi=event.Jet_phi[tightJets_id_in24[0]]
       j1_mass=event.Jet_mass_nom[tightJets_id_in24[0]]
+      mj1j2=(jet_v4_all[0]+jet_v4_all[1]).M()
+      mj1j3=(jet_v4_all[0]+jet_v4_all[2]).M()
+      mj1j4=(jet_v4_all[0]+jet_v4_all[3]).M()
+      mj2j3=(jet_v4_all[1]+jet_v4_all[2]).M()
+      mj2j4=(jet_v4_all[1]+jet_v4_all[3]).M()
+      mj3j4=(jet_v4_all[2]+jet_v4_all[3]).M()
+      mj1j2j3=(jet_v4_all[0]+jet_v4_all[1]+jet_v4_all[2]).M()
+      mj1j2j4=(jet_v4_all[0]+jet_v4_all[1]+jet_v4_all[3]).M()
+      mj2j3j4=(jet_v4_all[1]+jet_v4_all[2]+jet_v4_all[3]).M()
+      mj1j2j3j4=(jet_v4_all[0]+jet_v4_all[1]+jet_v4_all[2]+jet_v4_all[3]).M()
+      drj1j2=jet_v4_all[0].DeltaR(jet_v4_all[1])
+      drj1j3=jet_v4_all[0].DeltaR(jet_v4_all[2])
+      drj1j4=jet_v4_all[0].DeltaR(jet_v4_all[3])
+      drj2j3=jet_v4_all[1].DeltaR(jet_v4_all[2])
+      drj2j4=jet_v4_all[1].DeltaR(jet_v4_all[3])
+      drj3j4=jet_v4_all[2].DeltaR(jet_v4_all[3])
     if n_tight_jet==3:
       j3_pt=event.Jet_pt_nom[tightJets_id_in24[2]]
       j3_eta=event.Jet_eta[tightJets_id_in24[2]]
@@ -408,6 +542,13 @@ class TTCProducer(Module):
       j1_eta=event.Jet_eta[tightJets_id_in24[0]]
       j1_phi=event.Jet_phi[tightJets_id_in24[0]]
       j1_mass=event.Jet_mass_nom[tightJets_id_in24[0]]
+      mj1j2=(jet_v4_all[0]+jet_v4_all[1]).M()
+      mj1j3=(jet_v4_all[0]+jet_v4_all[2]).M()
+      mj2j3=(jet_v4_all[1]+jet_v4_all[2]).M()
+      mj1j2j3=(jet_v4_all[0]+jet_v4_all[1]+jet_v4_all[2]).M()
+      drj1j2=jet_v4_all[0].DeltaR(jet_v4_all[1])
+      drj1j3=jet_v4_all[0].DeltaR(jet_v4_all[2])
+      drj2j3=jet_v4_all[1].DeltaR(jet_v4_all[2])
     if n_tight_jet==2:
       j2_pt=event.Jet_pt_nom[tightJets_id_in24[1]]
       j2_eta=event.Jet_eta[tightJets_id_in24[1]]
@@ -417,6 +558,8 @@ class TTCProducer(Module):
       j1_eta=event.Jet_eta[tightJets_id_in24[0]]
       j1_phi=event.Jet_phi[tightJets_id_in24[0]]
       j1_mass=event.Jet_mass_nom[tightJets_id_in24[0]]
+      mj1j2=(jet_v4_all[0]+jet_v4_all[1]).M()
+      drj1j2=jet_v4_all[0].DeltaR(jet_v4_all[1])
     if n_tight_jet==1:
       j1_pt=event.Jet_pt_nom[tightJets_id_in24[0]]
       j1_eta=event.Jet_eta[tightJets_id_in24[0]]
@@ -469,6 +612,22 @@ class TTCProducer(Module):
     self.out.fillBranch("j4_eta",j4_eta)
     self.out.fillBranch("j4_phi",j4_phi)
     self.out.fillBranch("j4_mass",j4_mass)
+    self.out.fillBranch("mj1j2", mj1j2)
+    self.out.fillBranch("mj1j3", mj1j3)
+    self.out.fillBranch("mj1j4", mj1j4)
+    self.out.fillBranch("mj2j3", mj2j3)
+    self.out.fillBranch("mj2j4", mj2j4)
+    self.out.fillBranch("mj3j4", mj3j4)
+    self.out.fillBranch("mj1j2j3", mj1j2j3)
+    self.out.fillBranch("mj1j2j4", mj1j2j4)
+    self.out.fillBranch("mj2j3j4", mj2j3j4)
+    self.out.fillBranch("mj1j2j3j4", mj1j2j3j4)
+    self.out.fillBranch("drj1j2", drj1j2)
+    self.out.fillBranch("drj1j3", drj1j3)
+    self.out.fillBranch("drj1j4", drj1j4)
+    self.out.fillBranch("drj2j3", drj2j3)
+    self.out.fillBranch("drj2j4", drj2j4)
+    self.out.fillBranch("drj3j4", drj3j4)
     self.out.fillBranch("DeepB_j1_pt",DeepB_j1_pt)
     self.out.fillBranch("DeepB_j1_eta",DeepB_j1_eta)
     self.out.fillBranch("DeepB_j1_phi",DeepB_j1_phi)
@@ -496,7 +655,7 @@ class TTCProducer(Module):
     self.out.fillBranch("tightJets_b_DeepCSVmedium_id",tightJets_b_DeepCSVmedium_id)
     self.out.fillBranch("tightJets_c_DeepCSVmedium_id",tightJets_c_DeepCSVmedium_id)
 
-    if len(tightLeptons)<2:return False
+    if len(tightLeptons)+len(fakeableLeptons)<2:return False
 
     #    t     t      cccc
     #  ttttt ttttt   cc
@@ -508,6 +667,11 @@ class TTCProducer(Module):
     ttc_nl=False
     #ttc region jet and bjet selection
     ttc_jets=False
+    ttc_2P0F=False
+    ttc_1P1F=False
+    ttc_0P2F=False
+    ttc_lep1_faketag=False
+    ttc_lep2_faketag=False
     #ttc region tag, 1:2 muon, 2:1 muon, 3:0 muon
     ttc_region=0
     ttc_l1_id=-1
@@ -541,7 +705,7 @@ class TTCProducer(Module):
     ttc_mllj4=-99
     
     # the two leptons with pt 20, 3th lepton veto
-    if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
+    if len(tightLeptons)+len(fakeableLeptons)==2 and len(looseLeptons)==0:
       ttc_nl=True
     # at least three jets
     if ttc_nl and n_tight_jet>2:
@@ -554,57 +718,250 @@ class TTCProducer(Module):
       else:
         ttc_met=event.MET_T1_pt
         ttc_met_phi=event.MET_T1_phi
-      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26:
-	ttc_region=1
-	ttc_l1_id=tightMuons_id[0]
-	ttc_l2_id=tightMuons_id[1]
-	ttc_l1_pdgid=tightMuons_pdgid[0]
-	ttc_l2_pdgid=tightMuons_pdgid[1]
-	ttc_l1_pt=tightMuons[0].Pt()
-	ttc_l1_eta=tightMuons[0].Eta()
-	ttc_l1_phi=tightMuons[0].Phi()
-	ttc_l1_mass=tightMuons[0].M()
-	ttc_l2_pt=tightMuons[1].Pt()
-	ttc_l2_eta=tightMuons[1].Eta()
-	ttc_l2_phi=tightMuons[1].Phi()
-	ttc_l2_mass=tightMuons[1].M()
-	ttc_mll=(tightMuons[0]+tightMuons[1]).M()
-	ttc_drll=tightMuons[0].DeltaR(tightMuons[1])
-	ttc_dphill=tightMuons[0].DeltaPhi(tightMuons[1])
-      if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24:
-	ttc_region=2
-	ttc_l1_id=tightMuons_id[0]
-	ttc_l1_pdgid=tightMuons_pdgid[0]
-	ttc_l2_id=tightElectrons_id[0]
-	ttc_l2_pdgid=tightElectrons_pdgid[0]
-	ttc_l1_pt=tightMuons[0].Pt()
-        ttc_l1_eta=tightMuons[0].Eta()
-        ttc_l1_phi=tightMuons[0].Phi()
-        ttc_l1_mass=tightMuons[0].M()
-        ttc_l2_pt=tightElectrons[0].Pt()
-        ttc_l2_eta=tightElectrons[0].Eta()
-        ttc_l2_phi=tightElectrons[0].Phi()
-        ttc_l2_mass=tightElectrons[0].M()
-        ttc_mll=(tightMuons[0]+tightElectrons[0]).M()
-        ttc_drll=tightMuons[0].DeltaR(tightElectrons[0])
-        ttc_dphill=tightMuons[0].DeltaPhi(tightElectrons[0])
-      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22:
-	ttc_region=3
-	ttc_l1_id=tightElectrons_id[0]
-	ttc_l2_id=tightElectrons_id[1]
-	ttc_l1_pdgid=tightElectrons_pdgid[0]
-	ttc_l2_pdgid=tightElectrons_pdgid[1]
-	ttc_l1_pt=tightElectrons[0].Pt()
-        ttc_l1_eta=tightElectrons[0].Eta()
-        ttc_l1_phi=tightElectrons[0].Phi()
-        ttc_l1_mass=tightElectrons[0].M()
-        ttc_l2_pt=tightElectrons[1].Pt()
-        ttc_l2_eta=tightElectrons[1].Eta()
-        ttc_l2_phi=tightElectrons[1].Phi()
-        ttc_l2_mass=tightElectrons[1].M()
-        ttc_mll=(tightElectrons[0]+tightElectrons[1]).M()
-        ttc_drll=tightElectrons[0].DeltaR(tightElectrons[1])
-        ttc_dphill=tightElectrons[0].DeltaPhi(tightElectrons[1])
+
+      if len(tightLeptons)==2:
+	ttc_2P0F=True
+        ttc_1P1F=False
+        ttc_0P2F=False
+        ttc_lep1_faketag=False
+        ttc_lep2_faketag=False
+        if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==26:
+          ttc_region=1
+          ttc_l1_id=tightMuons_id[0]
+          ttc_l2_id=tightMuons_id[1]
+          ttc_l1_pdgid=tightMuons_pdgid[0]
+          ttc_l2_pdgid=tightMuons_pdgid[1]
+          ttc_l1_pt=tightMuons[0].Pt()
+          ttc_l1_eta=tightMuons[0].Eta()
+          ttc_l1_phi=tightMuons[0].Phi()
+          ttc_l1_mass=tightMuons[0].M()
+          ttc_l2_pt=tightMuons[1].Pt()
+          ttc_l2_eta=tightMuons[1].Eta()
+          ttc_l2_phi=tightMuons[1].Phi()
+          ttc_l2_mass=tightMuons[1].M()
+          ttc_mll=(tightMuons[0]+tightMuons[1]).M()
+          ttc_drll=tightMuons[0].DeltaR(tightMuons[1])
+          ttc_dphill=tightMuons[0].DeltaPhi(tightMuons[1])
+        if len(tightElectrons)==1 and abs(tightMuons_pdgid[0]+tightElectrons_pdgid[0])==24:
+          ttc_region=2
+          ttc_l1_id=tightMuons_id[0]
+          ttc_l1_pdgid=tightMuons_pdgid[0]
+          ttc_l2_id=tightElectrons_id[0]
+          ttc_l2_pdgid=tightElectrons_pdgid[0]
+          ttc_l1_pt=tightMuons[0].Pt()
+          ttc_l1_eta=tightMuons[0].Eta()
+          ttc_l1_phi=tightMuons[0].Phi()
+          ttc_l1_mass=tightMuons[0].M()
+          ttc_l2_pt=tightElectrons[0].Pt()
+          ttc_l2_eta=tightElectrons[0].Eta()
+          ttc_l2_phi=tightElectrons[0].Phi()
+          ttc_l2_mass=tightElectrons[0].M()
+          ttc_mll=(tightMuons[0]+tightElectrons[0]).M()
+          ttc_drll=tightMuons[0].DeltaR(tightElectrons[0])
+          ttc_dphill=tightMuons[0].DeltaPhi(tightElectrons[0])
+        if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==22:
+          ttc_region=3
+          ttc_l1_id=tightElectrons_id[0]
+          ttc_l2_id=tightElectrons_id[1]
+          ttc_l1_pdgid=tightElectrons_pdgid[0]
+          ttc_l2_pdgid=tightElectrons_pdgid[1]
+          ttc_l1_pt=tightElectrons[0].Pt()
+          ttc_l1_eta=tightElectrons[0].Eta()
+          ttc_l1_phi=tightElectrons[0].Phi()
+          ttc_l1_mass=tightElectrons[0].M()
+          ttc_l2_pt=tightElectrons[1].Pt()
+          ttc_l2_eta=tightElectrons[1].Eta()
+          ttc_l2_phi=tightElectrons[1].Phi()
+          ttc_l2_mass=tightElectrons[1].M()
+          ttc_mll=(tightElectrons[0]+tightElectrons[1]).M()
+          ttc_drll=tightElectrons[0].DeltaR(tightElectrons[1])
+          ttc_dphill=tightElectrons[0].DeltaPhi(tightElectrons[1])
+
+      # one real and one fake lepton
+      if len(tightLeptons)==1:
+	ttc_2P0F=False
+        ttc_1P1F=True
+        ttc_0P2F=False
+	#one real muon
+        if len(tightElectrons)==0:
+	  # one fake muon
+          if len(fakeable_Electrons)==0 and abs(tightMuons_pdgid[0]+fakeable_Muons_pdgid[0])==26:
+	    ttc_region=1
+            if tightMuons[0].Pt()>fakeable_Muons[0].Pt():
+              ttc_lep1_faketag=False
+              ttc_lep2_faketag=True
+              ttc_l1_id=tightMuons_id[0]
+              ttc_l2_id=fakeable_Muons_id[0]
+              ttc_l1_pdgid=tightMuons_pdgid[0]
+              ttc_l2_pdgid=fakeable_Muons_pdgid[0]
+              ttc_l1_pt=tightMuons[0].Pt()
+              ttc_l1_eta=tightMuons[0].Eta()
+              ttc_l1_phi=tightMuons[0].Phi()
+              ttc_l1_mass=tightMuons[0].M()
+              ttc_l2_pt=fakeable_Muons[0].Pt()
+              ttc_l2_eta=fakeable_Muons[0].Eta()
+              ttc_l2_phi=fakeable_Muons[0].Phi()
+              ttc_l2_mass=fakeable_Muons[0].M()
+	    else:
+              ttc_lep1_faketag=True
+              ttc_lep2_faketag=False
+              ttc_l1_id=fakeable_Muons_id[0]
+              ttc_l2_id=tightMuons_id[0]
+              ttc_l1_pdgid=fakeable_Muons_pdgid[0]
+              ttc_l2_pdgid=tightMuons_pdgid[0]
+              ttc_l1_pt=fakeable_Muons[0].Pt()
+              ttc_l1_eta=fakeable_Muons[0].Eta()
+              ttc_l1_phi=fakeable_Muons[0].Phi()
+              ttc_l1_mass=fakeable_Muons[0].M()
+              ttc_l2_pt=tightMuons[0].Pt()
+              ttc_l2_eta=tightMuons[0].Eta()
+              ttc_l2_phi=tightMuons[0].Phi()
+              ttc_l2_mass=tightMuons[0].M()
+	    ttc_mll=(fakeable_Muons[0]+tightMuons[0]).M()
+            ttc_drll=fakeable_Muons[0].DeltaR(tightMuons[0])
+            ttc_dphill=fakeable_Muons[0].DeltaPhi(tightMuons[0])
+  	  # one fake electron
+          if len(fakeable_Electrons)==1 and abs(tightMuons_pdgid[0]+fakeable_Electrons_pdgid[0])==24:
+            ttc_region=2
+            ttc_lep1_faketag=False
+            ttc_lep2_faketag=True
+            ttc_l1_id=tightMuons_id[0]
+            ttc_l2_id=fakeable_Electrons_id[0]
+            ttc_l1_pdgid=tightMuons_pdgid[0]
+            ttc_l2_pdgid=fakeable_Electrons_pdgid[0]
+            ttc_l1_pt=tightMuons[0].Pt()
+            ttc_l1_eta=tightMuons[0].Eta()
+            ttc_l1_phi=tightMuons[0].Phi()
+            ttc_l1_mass=tightMuons[0].M()
+            ttc_l2_pt=fakeable_Electrons[0].Pt()
+            ttc_l2_eta=fakeable_Electrons[0].Eta()
+            ttc_l2_phi=fakeable_Electrons[0].Phi()
+            ttc_l2_mass=fakeable_Electrons[0].M()
+            ttc_mll=(fakeable_Electrons[0]+tightMuons[0]).M()
+            ttc_drll=fakeable_Electrons[0].DeltaR(tightMuons[0])
+            ttc_dphill=fakeable_Electrons[0].DeltaPhi(tightMuons[0])
+	
+	#one real electron
+        if len(tightElectrons)==1:
+          # one fake muon
+          if len(fakeable_Electrons)==0 and abs(tightElectrons_pdgid[0]+fakeable_Muons_pdgid[0])==24:
+            ttc_region=2
+            ttc_lep1_faketag=True
+            ttc_lep2_faketag=False
+            ttc_l1_id=fakeable_Muons_id[0]
+            ttc_l2_id=tightElectrons_id[0]
+            ttc_l1_pdgid=fakeable_Muons_pdgid[0]
+            ttc_l2_pdgid=tightElectrons_pdgid[0]
+            ttc_l1_pt=fakeable_Muons[0].Pt()
+            ttc_l1_eta=fakeable_Muons[0].Eta()
+            ttc_l1_phi=fakeable_Muons[0].Phi()
+            ttc_l1_mass=fakeable_Muons[0].M()
+            ttc_l2_pt=tightElectrons[0].Pt()
+            ttc_l2_eta=tightElectrons[0].Eta()
+            ttc_l2_phi=tightElectrons[0].Phi()
+            ttc_l2_mass=tightElectrons[0].M()
+            ttc_mll=(fakeable_Muons[0]+tightElectrons[0]).M()
+            ttc_drll=fakeable_Muons[0].DeltaR(tightElectrons[0])
+            ttc_dphill=fakeable_Muons[0].DeltaPhi(tightElectrons[0])
+
+	  # one fake electron
+          if len(fakeable_Electrons)==1 and abs(tightElectrons_pdgid[0]+fakeable_Electrons_pdgid[0])==22:
+            ttc_region=3
+            if tightElectrons[0].Pt()>fakeable_Electrons[0].Pt():
+              ttc_lep1_faketag=False
+              ttc_lep2_faketag=True
+              ttc_l1_id=tightElectrons_id[0]
+              ttc_l2_id=fakeable_Electrons_id[0]
+              ttc_l1_pdgid=tightElectrons_pdgid[0]
+              ttc_l2_pdgid=fakeable_Electrons_pdgid[0]
+              ttc_l1_pt=tightElectrons[0].Pt()
+              ttc_l1_eta=tightElectrons[0].Eta()
+              ttc_l1_phi=tightElectrons[0].Phi()
+              ttc_l1_mass=tightElectrons[0].M()
+              ttc_l2_pt=fakeable_Electrons[0].Pt()
+              ttc_l2_eta=fakeable_Electrons[0].Eta()
+              ttc_l2_phi=fakeable_Electrons[0].Phi()
+              ttc_l2_mass=fakeable_Electrons[0].M()
+	    else:
+              ttc_lep1_faketag=True
+              ttc_lep2_faketag=False
+              ttc_l1_id=fakeable_Electrons_id[0]
+              ttc_l2_id=tightElectrons_id[0]
+              ttc_l1_pdgid=fakeable_Electrons_pdgid[0]
+              ttc_l2_pdgid=tightElectrons_pdgid[0]
+              ttc_l1_pt=fakeable_Electrons[0].Pt()
+              ttc_l1_eta=fakeable_Electrons[0].Eta()
+              ttc_l1_phi=fakeable_Electrons[0].Phi()
+              ttc_l1_mass=fakeable_Electrons[0].M()
+              ttc_l2_pt=tightElectrons[0].Pt()
+              ttc_l2_eta=tightElectrons[0].Eta()
+              ttc_l2_phi=tightElectrons[0].Phi()
+              ttc_l2_mass=tightElectrons[0].M()
+            ttc_mll=(fakeable_Electrons[0]+tightElectrons[0]).M()
+            ttc_drll=fakeable_Electrons[0].DeltaR(tightElectrons[0])
+            ttc_dphill=fakeable_Electrons[0].DeltaPhi(tightElectrons[0])
+
+      # two fake leptons
+      if len(tightLeptons)==0:
+	ttc_2P0F=False
+        ttc_1P1F=False
+        ttc_0P2F=True
+	ttc_lep1_faketag=True
+        ttc_lep2_faketag=True
+
+	if len(fakeable_Electrons)==0 and abs(fakeable_Muons_pdgid[0]+fakeable_Muons_pdgid[1])==26:
+          ttc_region=1
+          ttc_l1_id=fakeable_Muons_id[0]
+          ttc_l2_id=fakeable_Muons_id[1]
+          ttc_l1_pdgid=fakeable_Muons_pdgid[0]
+          ttc_l2_pdgid=fakeable_Muons_pdgid[1]
+          ttc_l1_pt=fakeable_Muons[0].Pt()
+          ttc_l1_eta=fakeable_Muons[0].Eta()
+          ttc_l1_phi=fakeable_Muons[0].Phi()
+          ttc_l1_mass=fakeable_Muons[0].M()
+          ttc_l2_pt=fakeable_Muons[1].Pt()
+          ttc_l2_eta=fakeable_Muons[1].Eta()
+          ttc_l2_phi=fakeable_Muons[1].Phi()
+          ttc_l2_mass=fakeable_Muons[1].M()
+          ttc_mll=(fakeable_Muons[0]+fakeable_Muons[1]).M()
+          ttc_drll=fakeable_Muons[0].DeltaR(fakeable_Muons[1])
+          ttc_dphill=fakeable_Muons[0].DeltaPhi(fakeable_Muons[1])
+
+	if len(fakeable_Electrons)==1 and abs(fakeable_Muons_pdgid[0]+fakeable_Electrons_pdgid[0])==24:
+          ttc_region=2
+          ttc_l1_id=fakeable_Muons_id[0]
+          ttc_l1_pdgid=fakeable_Muons_pdgid[0]
+          ttc_l2_id=fakeable_Electrons_id[0]
+          ttc_l2_pdgid=fakeable_Electrons_pdgid[0]
+          ttc_l1_pt=fakeable_Muons[0].Pt()
+          ttc_l1_eta=fakeable_Muons[0].Eta()
+          ttc_l1_phi=fakeable_Muons[0].Phi()
+          ttc_l1_mass=fakeable_Muons[0].M()
+          ttc_l2_pt=fakeable_Electrons[0].Pt()
+          ttc_l2_eta=fakeable_Electrons[0].Eta()
+          ttc_l2_phi=fakeable_Electrons[0].Phi()
+          ttc_l2_mass=fakeable_Electrons[0].M()
+          ttc_mll=(fakeable_Muons[0]+fakeable_Electrons[0]).M()
+          ttc_drll=fakeable_Muons[0].DeltaR(fakeable_Electrons[0])
+          ttc_dphill=fakeable_Muons[0].DeltaPhi(fakeable_Electrons[0])
+
+	if len(fakeable_Electrons)==2 and abs(fakeable_Electrons_pdgid[0]+fakeable_Electrons_pdgid[1])==22:
+          ttc_region=3
+          ttc_l1_id=fakeable_Electrons_id[0]
+          ttc_l2_id=fakeable_Electrons_id[1]
+          ttc_l1_pdgid=fakeable_Electrons_pdgid[0]
+          ttc_l2_pdgid=fakeable_Electrons_pdgid[1]
+          ttc_l1_pt=fakeable_Electrons[0].Pt()
+          ttc_l1_eta=fakeable_Electrons[0].Eta()
+          ttc_l1_phi=fakeable_Electrons[0].Phi()
+          ttc_l1_mass=fakeable_Electrons[0].M()
+          ttc_l2_pt=fakeable_Electrons[1].Pt()
+          ttc_l2_eta=fakeable_Electrons[1].Eta()
+          ttc_l2_phi=fakeable_Electrons[1].Phi()
+          ttc_l2_mass=fakeable_Electrons[1].M()
+          ttc_mll=(fakeable_Electrons[0]+fakeable_Electrons[1]).M()
+          ttc_drll=fakeable_Electrons[0].DeltaR(fakeable_Electrons[1])
+          ttc_dphill=fakeable_Electrons[0].DeltaPhi(fakeable_Electrons[1])
 
     if ttc_region>0:
       l1_v4_temp=TLorentzVector()
@@ -660,6 +1017,11 @@ class TTCProducer(Module):
         ttc_dr_l2j1=l2_v4_temp.DeltaR(j1_v4_temp)
         ttc_mllj1=(l1_v4_temp+l2_v4_temp+j1_v4_temp).M()
 
+    self.out.fillBranch("ttc_2P0F", ttc_2P0F)
+    self.out.fillBranch("ttc_1P1F", ttc_1P1F)
+    self.out.fillBranch("ttc_0P2F", ttc_0P2F)
+    self.out.fillBranch("ttc_lep1_faketag", ttc_lep1_faketag)
+    self.out.fillBranch("ttc_lep2_faketag", ttc_lep2_faketag)
     self.out.fillBranch("ttc_nl", ttc_nl)
     self.out.fillBranch("ttc_jets", ttc_jets)
     self.out.fillBranch("ttc_region", ttc_region)
@@ -1148,6 +1510,11 @@ class TTCProducer(Module):
     #DY region lepton number selections
     DY_nl=False
     #DY region tag, 0: fail to pass the DY selection, 1:2 muon, 2:1 muon, 3:0 muon
+    DY_2P0F=False
+    DY_1P1F=False
+    DY_0P2F=False
+    DY_lep1_faketag=False
+    DY_lep2_faketag=False
     DY_region=0
     DY_l1_id=-1
     DY_l2_id=-1
@@ -1174,89 +1541,296 @@ class TTCProducer(Module):
     DY_drll=-99
 
     # the two leptons with pt >20, 3th lepton veto
-    if len(tightLeptons)==2 and tightLeptons[1].Pt()>20 and len(looseLeptons)==0:
+    if len(tightLeptons)+len(fakeableLeptons)==2 and len(looseLeptons)==0:
       DY_nl=True
     if DY_nl:
-      # 2 muons case
-      if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==0:
-	DY_region=1
-	DY_l1_id=tightMuons_id[0]
-	DY_l2_id=tightMuons_id[1]
-	DY_l1_pdgid=tightMuons_pdgid[0]
-	DY_l2_pdgid=tightMuons_pdgid[1]
-	DY_l1_pt=tightMuons[0].Pt()
-	DY_l1_eta=tightMuons[0].Eta()
-	DY_l1_phi=tightMuons[0].Phi()
-	DY_l1_mass=tightMuons[0].M()
-	DY_l2_pt=tightMuons[1].Pt()
-	DY_l2_eta=tightMuons[1].Eta()
-	DY_l2_phi=tightMuons[1].Phi()
-	DY_l2_mass=tightMuons[1].M()
-	DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
-	DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
-	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
-	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
-	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
-	DY_l1_pt_raw=tightMuons_raw[0].Pt()
-	DY_l2_pt_raw=tightMuons_raw[1].Pt()
-	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
-	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
-	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
-	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
-      # 2 eles case
-      if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==0:
-	DY_region=3
-        DY_l1_id=tightElectrons_id[0]
-        DY_l2_id=tightElectrons_id[1]
-        DY_l1_pdgid=tightElectrons_pdgid[0]
-        DY_l2_pdgid=tightElectrons_pdgid[1]
-	DY_l1_pt=tightElectrons[0].Pt()
-	DY_l1_eta=tightElectrons[0].Eta()
-	DY_l1_phi=tightElectrons[0].Phi()
-	DY_l1_mass=tightElectrons[0].M()
-	DY_l2_pt=tightElectrons[1].Pt()
-	DY_l2_eta=tightElectrons[1].Eta()
-	DY_l2_phi=tightElectrons[1].Phi()
-	DY_l2_mass=tightElectrons[1].M()
-	DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
-	DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
-	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
-	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
-	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
-	DY_l1_pt_raw=tightElectrons_raw[0].Pt()
-	DY_l2_pt_raw=tightElectrons_raw[1].Pt()
-	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
-	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
-	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
-	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
-      # 1 ele case
-      if len(tightElectrons)==1 and (sign(tightMuons_pdgid[0])+sign(tightElectrons_pdgid[0]))==0:
-	DY_region=2
-        DY_l1_id=tightMuons_id[0]
-        DY_l2_id=tightElectrons_id[0]
-        DY_l1_pdgid=tightMuons_pdgid[0]
-        DY_l2_pdgid=tightElectrons_pdgid[0]
-	DY_l1_pt=tightMuons[0].Pt()
-	DY_l1_eta=tightMuons[0].Eta()
-	DY_l1_phi=tightMuons[0].Phi()
-	DY_l1_mass=tightMuons[0].M()
-	DY_l2_pt=tightElectrons[0].Pt()
-	DY_l2_eta=tightElectrons[0].Eta()
-	DY_l2_phi=tightElectrons[0].Phi()
-	DY_l2_mass=tightElectrons[0].M()
-	DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
-	DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
-	DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
-	DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
-	DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
-	DY_l1_pt_raw=tightMuons_raw[0].Pt()
-	DY_l2_pt_raw=tightElectrons_raw[0].Pt()
-	DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
-	DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
-	DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
-	DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
+      if len(tightLeptons)==2:
+	DY_2P0F=True
+        DY_1P1F=False
+        DY_0P2F=False
+        DY_lep1_faketag=False
+        DY_lep2_faketag=False
+        # 2 muons case
+        if len(tightElectrons)==0 and abs(tightMuons_pdgid[0]+tightMuons_pdgid[1])==0:
+	  DY_region=1
+	  DY_l1_id=tightMuons_id[0]
+	  DY_l2_id=tightMuons_id[1]
+	  DY_l1_pdgid=tightMuons_pdgid[0]
+	  DY_l2_pdgid=tightMuons_pdgid[1]
+	  DY_l1_pt=tightMuons[0].Pt()
+	  DY_l1_eta=tightMuons[0].Eta()
+	  DY_l1_phi=tightMuons[0].Phi()
+	  DY_l1_mass=tightMuons[0].M()
+	  DY_l2_pt=tightMuons[1].Pt()
+	  DY_l2_eta=tightMuons[1].Eta()
+	  DY_l2_phi=tightMuons[1].Phi()
+	  DY_l2_mass=tightMuons[1].M()
+	  DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
+	  DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
+	  DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
+	  DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
+	  DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+	  DY_l1_pt_raw=tightMuons_raw[0].Pt()
+	  DY_l2_pt_raw=tightMuons_raw[1].Pt()
+	  DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+	  DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+	  DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+	  DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
+        # 2 eles case
+        if len(tightElectrons)==2 and abs(tightElectrons_pdgid[0]+tightElectrons_pdgid[1])==0:
+    	  DY_region=3
+          DY_l1_id=tightElectrons_id[0]
+          DY_l2_id=tightElectrons_id[1]
+          DY_l1_pdgid=tightElectrons_pdgid[0]
+          DY_l2_pdgid=tightElectrons_pdgid[1]
+  	  DY_l1_pt=tightElectrons[0].Pt()
+  	  DY_l1_eta=tightElectrons[0].Eta()
+  	  DY_l1_phi=tightElectrons[0].Phi()
+  	  DY_l1_mass=tightElectrons[0].M()
+  	  DY_l2_pt=tightElectrons[1].Pt()
+  	  DY_l2_eta=tightElectrons[1].Eta()
+  	  DY_l2_phi=tightElectrons[1].Phi()
+  	  DY_l2_mass=tightElectrons[1].M()
+  	  DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
+  	  DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
+  	  DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
+  	  DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
+  	  DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+  	  DY_l1_pt_raw=tightElectrons_raw[0].Pt()
+  	  DY_l2_pt_raw=tightElectrons_raw[1].Pt()
+  	  DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+  	  DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+  	  DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+  	  DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
+        # 1 ele case
+        if len(tightElectrons)==1 and (sign(tightMuons_pdgid[0])+sign(tightElectrons_pdgid[0]))==0:
+	  DY_region=2
+          DY_l1_id=tightMuons_id[0]
+          DY_l2_id=tightElectrons_id[0]
+          DY_l1_pdgid=tightMuons_pdgid[0]
+          DY_l2_pdgid=tightElectrons_pdgid[0]
+	  DY_l1_pt=tightMuons[0].Pt()
+	  DY_l1_eta=tightMuons[0].Eta()
+	  DY_l1_phi=tightMuons[0].Phi()
+	  DY_l1_mass=tightMuons[0].M()
+	  DY_l2_pt=tightElectrons[0].Pt()
+	  DY_l2_eta=tightElectrons[0].Eta()
+	  DY_l2_phi=tightElectrons[0].Phi()
+	  DY_l2_mass=tightElectrons[0].M()
+	  DY_z_mass=(tightLeptons[0]+tightLeptons[1]).M()
+	  DY_z_pt=(tightLeptons[0]+tightLeptons[1]).Pt()
+	  DY_z_eta=(tightLeptons[0]+tightLeptons[1]).Eta()
+	  DY_z_phi=(tightLeptons[0]+tightLeptons[1]).Phi()
+	  DY_drll=tightLeptons[0].DeltaR(tightLeptons[1])
+	  DY_l1_pt_raw=tightMuons_raw[0].Pt()
+	  DY_l2_pt_raw=tightElectrons_raw[0].Pt()
+	  DY_z_mass_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).M()
+	  DY_z_pt_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Pt()
+	  DY_z_eta_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Eta()
+	  DY_z_phi_raw=(tightLeptons_raw[0]+tightLeptons_raw[1]).Phi()
+
+      if len(tightLeptons)==1:
+	DY_2P0F=False
+        DY_1P1F=True
+        DY_0P2F=False
+	# one real muons
+        if len(tightElectrons)==0:
+          # one fake muon
+          if len(fakeable_Electrons)==0 and abs(tightMuons_pdgid[0]+fakeable_Muons_pdgid[0])==0:
+            DY_region=1
+            if tightMuons[0].Pt()>fakeable_Muons[0].Pt():
+              DY_lep1_faketag=False
+              DY_lep2_faketag=True
+              DY_l1_id=tightMuons_id[0]
+              DY_l2_id=fakeable_Muons_id[0]
+              DY_l1_pdgid=tightMuons_pdgid[0]
+              DY_l2_pdgid=fakeable_Muons_pdgid[0]
+              DY_l1_pt=tightMuons[0].Pt()
+              DY_l1_eta=tightMuons[0].Eta()
+              DY_l1_phi=tightMuons[0].Phi()
+              DY_l1_mass=tightMuons[0].M()
+              DY_l2_pt=fakeable_Muons[0].Pt()
+              DY_l2_eta=fakeable_Muons[0].Eta()
+              DY_l2_phi=fakeable_Muons[0].Phi()
+              DY_l2_mass=fakeable_Muons[0].M()
+	    else:
+              DY_lep1_faketag=True
+              DY_lep2_faketag=False
+              DY_l1_id=fakeable_Muons_id[0]
+              DY_l2_id=tightMuons_id[0]
+              DY_l1_pdgid=fakeable_Muons_pdgid[0]
+              DY_l2_pdgid=tightMuons_pdgid[0]
+              DY_l1_pt=fakeable_Muons[0].Pt()
+              DY_l1_eta=fakeable_Muons[0].Eta()
+              DY_l1_phi=fakeable_Muons[0].Phi()
+              DY_l1_mass=fakeable_Muons[0].M()
+              DY_l2_pt=tightMuons[0].Pt()
+              DY_l2_eta=tightMuons[0].Eta()
+              DY_l2_phi=tightMuons[0].Phi()
+              DY_l2_mass=tightMuons[0].M()
+            DY_z_mass=(fakeable_Muons[0]+tightMuons[0]).M()
+            DY_z_pt=(fakeable_Muons[0]+tightMuons[0]).Pt()
+            DY_z_eta=(fakeable_Muons[0]+tightMuons[0]).Eta()
+            DY_z_phi=(fakeable_Muons[0]+tightMuons[0]).Phi()
+            DY_drll=fakeable_Muons[0].DeltaR(tightMuons[0])
+	  
+	  # one fake electron
+          if len(fakeable_Electrons)==1 and (sign(tightMuons_pdgid[0])+sign(fakeable_Electrons_pdgid[0]))==0:
+            DY_region=2
+            DY_lep1_faketag=False
+            DY_lep2_faketag=True
+            DY_l1_id=tightMuons_id[0]
+            DY_l2_id=fakeable_Electrons_id[0]
+            DY_l1_pdgid=tightMuons_pdgid[0]
+            DY_l2_pdgid=fakeable_Electrons_pdgid[0]
+            DY_l1_pt=tightMuons[0].Pt()
+            DY_l1_eta=tightMuons[0].Eta()
+            DY_l1_phi=tightMuons[0].Phi()
+            DY_l1_mass=tightMuons[0].M()
+            DY_l2_pt=fakeable_Electrons[0].Pt()
+            DY_l2_eta=fakeable_Electrons[0].Eta()
+            DY_l2_phi=fakeable_Electrons[0].Phi()
+            DY_l2_mass=fakeable_Electrons[0].M()
+            DY_z_mass=(fakeable_Electrons[0]+tightMuons[0]).M()
+            DY_z_pt=(fakeable_Electrons[0]+tightMuons[0]).Pt()
+            DY_z_eta=(fakeable_Electrons[0]+tightMuons[0]).Eta()
+            DY_z_phi=(fakeable_Electrons[0]+tightMuons[0]).Phi()
+            DY_drll=fakeable_Electrons[0].DeltaR(tightMuons[0])
+
+	# one real electrons
+        if len(tightElectrons)==1:
+          # one fake muon
+          if len(fakeable_Electrons)==0 and abs(sign(tightElectrons_pdgid[0])+sign(fakeable_Muons_pdgid[0]))==0:
+            DY_region=2
+            DY_lep1_faketag=True
+            DY_lep2_faketag=False
+            DY_l1_id=fakeable_Muons_id[0]
+            DY_l2_id=tightElectrons_id[0]
+            DY_l1_pdgid=fakeable_Muons_pdgid[0]
+            DY_l2_pdgid=tightElectrons_pdgid[0]
+            DY_l1_pt=fakeable_Muons[0].Pt()
+            DY_l1_eta=fakeable_Muons[0].Eta()
+            DY_l1_phi=fakeable_Muons[0].Phi()
+            DY_l1_mass=fakeable_Muons[0].M()
+            DY_l2_pt=tightElectrons[0].Pt()
+            DY_l2_eta=tightElectrons[0].Eta()
+            DY_l2_phi=tightElectrons[0].Phi()
+            DY_l2_mass=tightElectrons[0].M()
+            DY_z_mass=(fakeable_Muons[0]+tightElectrons[0]).M()
+            DY_z_pt=(fakeable_Muons[0]+tightElectrons[0]).Pt()
+            DY_z_eta=(fakeable_Muons[0]+tightElectrons[0]).Eta()
+            DY_z_phi=(fakeable_Muons[0]+tightElectrons[0]).Phi()
+            DY_drll=fakeable_Muons[0].DeltaR(tightElectrons[0])    
+	  # one fake electron
+          if len(fakeable_Electrons)==1 and abs(tightElectrons_pdgid[0]+fakeable_Electrons_pdgid[0])==0:
+            DY_region=3
+            if tightElectrons[0].Pt()>fakeable_Electrons[0].Pt():
+              DY_lep1_faketag=False
+              DY_lep2_faketag=True
+              DY_l1_id=tightElectrons_id[0]
+              DY_l2_id=fakeable_Electrons_id[0]
+              DY_l1_pdgid=tightElectrons_pdgid[0]
+              DY_l2_pdgid=fakeable_Electrons_pdgid[0]
+              DY_l1_pt=tightElectrons[0].Pt()
+              DY_l1_eta=tightElectrons[0].Eta()
+              DY_l1_phi=tightElectrons[0].Phi()
+              DY_l1_mass=tightElectrons[0].M()
+              DY_l2_pt=fakeable_Electrons[0].Pt()
+              DY_l2_eta=fakeable_Electrons[0].Eta()
+              DY_l2_phi=fakeable_Electrons[0].Phi()
+              DY_l2_mass=fakeable_Electrons[0].M()
+            else:
+	      DY_lep1_faketag=True
+              DY_lep2_faketag=False
+              DY_l2_id=tightElectrons_id[0]
+              DY_l1_id=fakeable_Electrons_id[0]
+              DY_l2_pdgid=tightElectrons_pdgid[0]
+              DY_l1_pdgid=fakeable_Electrons_pdgid[0]
+              DY_l2_pt=tightElectrons[0].Pt()
+              DY_l2_eta=tightElectrons[0].Eta()
+              DY_l2_phi=tightElectrons[0].Phi()
+              DY_l2_mass=tightElectrons[0].M()
+              DY_l1_pt=fakeable_Electrons[0].Pt()
+              DY_l1_eta=fakeable_Electrons[0].Eta()
+              DY_l1_phi=fakeable_Electrons[0].Phi()
+              DY_l1_mass=fakeable_Electrons[0].M()
+            DY_z_mass=(fakeable_Electrons[0]+tightElectrons[0]).M()
+            DY_z_pt=(fakeable_Electrons[0]+tightElectrons[0]).Pt()
+            DY_z_eta=(fakeable_Electrons[0]+tightElectrons[0]).Eta()
+            DY_z_phi=(fakeable_Electrons[0]+tightElectrons[0]).Phi()
+            DY_drll=fakeable_Electrons[0].DeltaR(tightElectrons[0])
+
+      if len(tightLeptons)==0:
+	DY_2P0F=False
+        DY_1P1F=False
+        DY_0P2F=True
+	# 2 muons case
+        if len(fakeable_Electrons)==0 and abs(fakeable_Muons_pdgid[0]+fakeable_Muons_pdgid[1])==0:
+          DY_region=1
+          DY_l1_id=fakeable_Muons_id[0]
+          DY_l2_id=fakeable_Muons_id[1]
+          DY_l1_pdgid=fakeable_Muons_pdgid[0]
+          DY_l2_pdgid=fakeable_Muons_pdgid[1]
+          DY_l1_pt=fakeable_Muons[0].Pt()
+          DY_l1_eta=fakeable_Muons[0].Eta()
+          DY_l1_phi=fakeable_Muons[0].Phi()
+          DY_l1_mass=fakeable_Muons[0].M()
+          DY_l2_pt=fakeable_Muons[1].Pt()
+          DY_l2_eta=fakeable_Muons[1].Eta()
+          DY_l2_phi=fakeable_Muons[1].Phi()
+          DY_l2_mass=fakeable_Muons[1].M()
+          DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+          DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+          DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+          DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+          DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
+        # 2 eles case
+        if len(fakeable_Electrons)==2 and abs(fakeable_Electrons_pdgid[0]+fakeable_Electrons_pdgid[1])==0:
+	  DY_region=3
+          DY_l1_id=fakeable_Electrons_id[0]
+          DY_l2_id=fakeable_Electrons_id[1]
+          DY_l1_pdgid=fakeable_Electrons_pdgid[0]
+          DY_l2_pdgid=fakeable_Electrons_pdgid[1]
+          DY_l1_pt=fakeable_Electrons[0].Pt()
+          DY_l1_eta=fakeable_Electrons[0].Eta()
+          DY_l1_phi=fakeable_Electrons[0].Phi()
+          DY_l1_mass=fakeable_Electrons[0].M()
+          DY_l2_pt=fakeable_Electrons[1].Pt()
+          DY_l2_eta=fakeable_Electrons[1].Eta()
+          DY_l2_phi=fakeable_Electrons[1].Phi()
+          DY_l2_mass=fakeable_Electrons[1].M()
+          DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+          DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+          DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+          DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+          DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
+	# 1 ele case
+        if len(fakeable_Electrons)==1 and (sign(fakeable_Muons_pdgid[0])+sign(fakeable_Electrons_pdgid[0]))==0:
+          DY_region=2
+          DY_l1_id=fakeable_Muons_id[0]
+          DY_l2_id=fakeable_Electrons_id[0]
+          DY_l1_pdgid=fakeable_Muons_pdgid[0]
+          DY_l2_pdgid=fakeable_Electrons_pdgid[0]
+          DY_l1_pt=fakeable_Muons[0].Pt()
+          DY_l1_eta=fakeable_Muons[0].Eta()
+          DY_l1_phi=fakeable_Muons[0].Phi()
+          DY_l1_mass=fakeable_Muons[0].M()
+          DY_l2_pt=fakeable_Electrons[0].Pt()
+          DY_l2_eta=fakeable_Electrons[0].Eta()
+          DY_l2_phi=fakeable_Electrons[0].Phi()
+          DY_l2_mass=fakeable_Electrons[0].M()
+          DY_z_mass=(fakeableLeptons[0]+fakeableLeptons[1]).M()
+          DY_z_pt=(fakeableLeptons[0]+fakeableLeptons[1]).Pt()
+          DY_z_eta=(fakeableLeptons[0]+fakeableLeptons[1]).Eta()
+          DY_z_phi=(fakeableLeptons[0]+fakeableLeptons[1]).Phi()
+          DY_drll=fakeableLeptons[0].DeltaR(fakeableLeptons[1])
 
     self.out.fillBranch("DY_region", DY_region)
+    self.out.fillBranch("DY_2P0F", DY_2P0F)
+    self.out.fillBranch("DY_1P1F", DY_1P1F)
+    self.out.fillBranch("DY_0P2F", DY_0P2F)
+    self.out.fillBranch("DY_lep1_faketag", DY_lep1_faketag)
+    self.out.fillBranch("DY_lep2_faketag", DY_lep2_faketag)
     self.out.fillBranch("DY_l1_id", DY_l1_id)
     self.out.fillBranch("DY_l2_id", DY_l2_id)
     self.out.fillBranch("DY_l1_pdgid", DY_l1_pdgid)
