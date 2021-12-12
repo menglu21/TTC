@@ -4,7 +4,7 @@ config = Configuration()
 
 config.section_("General")
 config.General.requestName = 'DY'
-config.General.transferLogs = True
+config.General.transferLogs = False
 
 config.section_("JobType")
 config.JobType.allowUndistributedCMSSW = True
@@ -22,6 +22,7 @@ config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 1
 config.Data.totalUnits = -1
+#config.Data.outLFNDirBase = '/store/group/phys_top/ExtraYukawa/'
 config.Data.publication = False
 config.Data.outputDatasetTag = 'DY'
 

@@ -21,6 +21,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'LumiBased'
 config.Data.unitsPerJob = 80
 config.Data.lumiMask = 'Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
+#config.Data.outLFNDirBase = '/store/group/phys_top/ExtraYukawa/'
 config.Data.publication = False
 config.Data.outputDatasetTag = 'SingleEG_F'
 

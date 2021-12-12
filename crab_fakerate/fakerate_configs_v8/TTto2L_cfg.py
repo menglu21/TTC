@@ -19,8 +19,8 @@ config.section_("Data")
 config.Data.inputDataset = '/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv2-106X_mc2017_realistic_v8-v1/NANOAODSIM'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
-#config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 1
+#config.Data.outLFNDirBase = '/store/group/phys_top/ExtraYukawa/'
 config.Data.totalUnits = -1
 config.Data.publication = False
 config.Data.outputDatasetTag = 'TTTo2L2Nu'
