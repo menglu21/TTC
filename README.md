@@ -2,7 +2,7 @@
 
 ## Steps for setup:
 
-1. release CMSSW_10_6_27
+1. release CMSSW_10_6_29
 2. Set up NanoAOD tools
    ```bash
    cd $CMSSW_BASE/src
