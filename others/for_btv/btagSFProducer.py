@@ -141,7 +141,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepJet_106XUL17SF_V2p1.csv",
+                    'inputFileName': "DeepJet_106XUL17SF_V3.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -159,7 +159,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepJet_106XUL18SF.csv",
+                    'inputFileName': "DeepJet_106XUL18SF_V2.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -382,3 +382,4 @@ class btagSFProducer(Module):
 
 btagSF2016 = lambda: btagSFProducer("2016")
 btagSF2017UL = lambda: btagSFProducer("UL2017")
+btagSF2018UL = lambda: btagSFProducer("UL2018")
