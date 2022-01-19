@@ -1,0 +1,5 @@
+the 2018 data input is generated using:
+pileupCalc.py -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PileUp/UltraLegacy/pileup_latest.txt --calcMode true --minBiasXsec 69200  --maxPileupBin 99 --numPileupBins 99 PileupHistogram-goldenJSON-13tev-UL2018-99bins_withVar.root
+
+the MC inputs are taken from:
+https://github.com/cms-sw/cmssw/blob/CMSSW_10_6_X/SimGeneral/MixingModule/python/mix_2018_25ns_UltraLegacy_PoissonOOTPU_cfi.py

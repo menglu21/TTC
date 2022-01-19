@@ -146,9 +146,9 @@ puWeight_2017 = lambda: puWeightProducer(pufile_mc2017,
 puAutoWeight_2017 = lambda: puWeightProducer(
     "auto", pufile_data2017, "pu_mc", "pileup", verbose=False)
 
-pufile_data2018 = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupHistogram-goldenJSON-13tev-2018-100bins_withVar.root" % os.environ[
+pufile_data2018 = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupHistogram-goldenJSON-13tev-UL2018-99bins_withVar.root" % os.environ[
     'CMSSW_BASE']
-pufile_mc2018 = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/mcPileup2018.root" % os.environ[
+pufile_mc2018 = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/mcPileupUL2018.root" % os.environ[
     'CMSSW_BASE']
 puWeight_2018 = lambda: puWeightProducer(pufile_mc2018,
                                          pufile_data2018,
