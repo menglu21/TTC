@@ -1,2 +1,2 @@
 local run:
-python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test/localrun.py -m -i $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test/DY.root --year 2017 -o $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test
+python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test/localrun.py -m -i $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test/DY.root --year 2017 -o $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/test -n 100
