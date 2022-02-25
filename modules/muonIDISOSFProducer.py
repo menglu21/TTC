@@ -274,6 +274,7 @@ class muonIDISOSFProducer(Module):
 
     return True
 
+muonIDISOSF2016apv = lambda: muonIDISOSFProducer("2016apv")
 muonIDISOSF2016 = lambda: muonIDISOSFProducer("2016")
 muonIDISOSF2017 = lambda: muonIDISOSFProducer("2017")
 muonIDISOSF2018 = lambda: muonIDISOSFProducer("2018")

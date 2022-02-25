@@ -161,6 +161,7 @@ class eleIDSFProducer(Module):
 
     return True
 
+eleIDSF2016apv = lambda: eleIDSFProducer("2016apv")
 eleIDSF2016 = lambda: eleIDSFProducer("2016")
 eleIDSF2017 = lambda: eleIDSFProducer("2017")
 eleIDSF2018 = lambda: eleIDSFProducer("2018")
