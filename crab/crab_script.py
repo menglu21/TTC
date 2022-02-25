@@ -29,9 +29,9 @@ def main():
 
   if opt.ismc:
     if opt.year == "2016a":
-      p = PostProcessor(".", inputFiles(), modules=[countHistogramsModule(),puWeight_2016_preAVP(),PrefCorr2016(),muonIDISOSF2016(),muonScaleRes2016a(),eleRECOSF2016(),eleIDSF2016(), TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+      p = PostProcessor(".", inputFiles(), modules=[countHistogramsModule(),puWeight_2016_preAVP(),PrefCorr2016(),muonIDISOSF2016(),muonScaleRes2016a(),eleRECOSF2016(),eleIDSF2016(),jmeCorrections_UL2016APVMC(), TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
     if opt.year == "2016b":
-      p = PostProcessor(".", inputFiles(), modules=[countHistogramsModule(),puWeight_2016_postAVP(),PrefCorr2016(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(), TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+      p = PostProcessor(".", inputFiles(), modules=[countHistogramsModule(),puWeight_2016_postAVP(),PrefCorr2016(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(),jmeCorrections_UL2016MC(), TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
     if opt.year == "2017":
       p = PostProcessor(".", inputFiles(), modules=[countHistogramsModule(),puWeight_2017(),PrefCorr2017(),muonIDISOSF2017(),muonScaleRes2017(),eleRECOSF2017(),eleIDSF2017(), jmeCorrections_UL2017MC(),btagSF2017UL(), TTC2017()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
     if opt.year == "2018":
@@ -40,12 +40,22 @@ def main():
 
 # Sequence for data
   if not (opt.ismc):
-    if opt.year == "2016b" or opt.year == "2016c" or opt.year == "2016d":
-      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
-    if opt.year == "2016e" or opt.year == "2016f":
-      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
-    if opt.year == "2016g" or opt.year == "2016h":
-      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016b(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016b":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),jmeCorrections_UL2016B(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016c":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),jmeCorrections_UL2016C(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016d":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),jmeCorrections_UL2016D(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016e":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),jmeCorrections_UL2016E(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016f_apv":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016a(),jmeCorrections_UL2016APVF(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016f":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016b(),jmeCorrections_UL2016F(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016g":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016b(),jmeCorrections_UL2016G(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
+    if opt.year == "2016h":
+      p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2016b(),jmeCorrections_UL2016H(),TTC2016()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
     if opt.year == "2017b":
       p = PostProcessor(".", inputFiles(), modules=[muonScaleRes2017(),jmeCorrections_UL2017B(),TTC2017()], provenance=True,fwkJobReport=True, jsonInput=runsAndLumis(),outputbranchsel="keep_and_drop.txt")
     if opt.year == "2017c":
