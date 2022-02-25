@@ -6,3 +6,8 @@ down value: 66017
 
 the MC inputs are taken from:
 https://github.com/cms-sw/cmssw/blob/CMSSW_10_6_X/SimGeneral/MixingModule/python/mix_2018_25ns_UltraLegacy_PoissonOOTPU_cfi.py
+
+
+for 2017:
+MC: https://github.com/gkrintir/cmssw/blob/03415b9bc3eede76697abb01635b67ea7a784cb2/SimGeneral/MixingModule/python/mix_2016_25ns_UltraLegacy_PoissonOOTPU_cfi.py
+Data:  /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/UltraLegacy/
