@@ -185,3 +185,6 @@ class PrefCorr(Module):
             pref_prob = max(pref_prob - math.sqrt(stat * stat + syst * syst),
                             0.0)
         return pref_prob
+
+PrefCorr2016 = lambda:PrefCorr("L1prefiring_jetempt_UL2016BtoH.root","L1prefiring_jetempt_2016BtoH","L1prefiring_photonpt_UL2016BtoH.root","L1prefiring_photonpt_2016BtoH")
+PrefCorr2017 = lambda:PrefCorr("L1prefiring_jetpt_UL2017BtoF.root","L1prefiring_jetpt_2017BtoF","L1prefiring_photonpt_UL2017BtoF.root","L1prefiring_photonpt_2017BtoF")
