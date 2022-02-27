@@ -122,6 +122,24 @@ class btagSFProducer(Module):
                 },
             },
             'deepjet': {
+                'UL2016apv': {
+                    'inputFileName': "DeepJet_106XUL16preVFPSF_v1.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL2016': {
+                    'inputFileName': "DeepJet_106XUL16postVFPSF_v2.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
                 'Legacy2016': {
                     'inputFileName': "DeepJet_2016LegacySF_V1.csv",
                     'measurement_types': {
@@ -141,7 +159,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepJet_106XUL17SF_V3.csv",
+                    'inputFileName': "DeepJet_106XUL17SF_V2p1.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -159,7 +177,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepJet_106XUL18SF_V2.csv",
+                    'inputFileName': "DeepCSV_106XUL18SF_V1p1.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -380,6 +398,7 @@ class btagSFProducer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 
-btagSF2016 = lambda: btagSFProducer("2016")
+btagSF2016ULapv = lambda: btagSFProducer("UL2016apv")
+btagSF2016UL = lambda: btagSFProducer("UL2016")
 btagSF2017UL = lambda: btagSFProducer("UL2017")
 btagSF2018UL = lambda: btagSFProducer("UL2018")
