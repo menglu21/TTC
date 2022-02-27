@@ -125,13 +125,13 @@ pufile_data2016_preAPV = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing
     'CMSSW_BASE']
 pufile_data2016_postAPV = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupHistogram-goldenJSON-13tev-UL2016-postVFP-99bins_withVar.root" % os.environ[
     'CMSSW_BASE']
-puWeight_2016_preAVP = lambda: puWeightProducer(pufile_mc2016,
+puWeight_2016_preAPV = lambda: puWeightProducer(pufile_mc2016,
                                          pufile_data2016_preAPV,
                                          "pu_mc",
                                          "pileup",
                                          verbose=False,
                                          doSysVar=True)
-puWeight_2016_postAVP = lambda: puWeightProducer(pufile_mc2016,
+puWeight_2016_postAPV = lambda: puWeightProducer(pufile_mc2016,
                                          pufile_data2016_postAPV,
                                          "pu_mc",
                                          "pileup",
