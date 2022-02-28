@@ -2,7 +2,7 @@
 
 year=${1}
 if [ -z "$year" ]; then
-  echo "Please specify which year!";
+  echo "Please specify which year! 2016apv; 2016; 2017; 2018";
   exit 1;
 fi
 
