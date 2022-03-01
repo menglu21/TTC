@@ -3,27 +3,27 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'tbar_tch'
+config.General.requestName = 'dummy'
 config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
-config.JobType.scriptExe = 'crab_script.sh'
+config.JobType.scriptExe = 'dummy'
 # hadd nano will not be needed once nano tools are in cmssw
 config.JobType.inputFiles = ['crab_script.py', '../scripts/haddnano.py','keep_and_drop.txt']
 config.JobType.sendPythonFolder = True
 
 config.section_("Data")
-config.Data.inputDataset = '/ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer19UL17NanoAODv2-106X_mc2017_realistic_v8-v1/NANOAODSIM'
+config.Data.inputDataset = 'dummy'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
-#config.Data.splitting = 'EventAwareLumiBased'
+config.Data.outLFNDirBase = '/store/group/phys_top/ExtraYukawa/TTC_version9/'
 config.Data.unitsPerJob = 1
 config.Data.totalUnits = -1
 config.Data.publication = False
-config.Data.outputDatasetTag = 'tbar_tch'
+config.Data.outputDatasetTag = 'dummy'
 
 config.section_("Site")
-config.Site.storageSite = "T3_CH_CERNBOX"
+config.Site.storageSite = "T2_CH_CERN"
