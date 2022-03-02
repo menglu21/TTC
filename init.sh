@@ -24,7 +24,7 @@ if [ ${year}==2016apv ]; then
   echo Updating prefiring correction
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetempt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetpt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
-  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2016BtoH.root $WORKING_PATH/modules/common/
+  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/PrefireCorr.py $WORKING_PATH/modules/common/
   
   echo Updateing JME correction
@@ -51,7 +51,7 @@ if [ ${year}==2016 ]; then
   echo Updating prefiring correction
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetempt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetpt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
-  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2016BtoH.root $WORKING_PATH/modules/common/
+  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2016BtoH.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/PrefireCorr.py $WORKING_PATH/modules/common/
   
   echo Updateing JME correction
@@ -78,7 +78,7 @@ if [ ${year}==2017 ]; then
   echo Updating prefiring correction
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetempt_UL2017BtoF.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_jetpt_UL2017BtoF.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
-  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2017BtoF.root $WORKING_PATH/modules/common/
+  cp $WORKING_PATH/analysis/others/for_prefiring/L1prefiring_photonpt_UL2017BtoF.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
   cp $WORKING_PATH/analysis/others/for_prefiring/PrefireCorr.py $WORKING_PATH/modules/common/
   
   echo Updateing JME correction
